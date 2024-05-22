@@ -1,0 +1,22 @@
+[package]
+name = "libpfcp"
+version = "0.1.0"
+authors = ["unknown"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+num = "0.3"
+num-derive = "0.3"
+num-traits = "0.2"
+bitfield = "0.13.2"
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "sync", "time"] }
+lazy_static = { version = "1.4" }
+async-trait = "0.1.48"
+futures = "0.3.13"
+once_cell = "*"
+derivative = "2.2.0"
+chrono = "0.4.19"
+cidr = "0.2"
+dashmap = "5"

@@ -1,0 +1,304 @@
+pkg_info {
+  arch: "v1model"
+}
+tables {
+  preamble {
+    id: 38831791
+    name: "ingress.outgoing_flow"
+    alias: "outgoing_flow"
+  }
+  match_fields {
+    id: 1
+    name: "hdr.ipv4.srcAddr"
+    bitwidth: 32
+    match_type: TERNARY
+  }
+  match_fields {
+    id: 2
+    name: "hdr.ipv4.dstAddr"
+    bitwidth: 32
+    match_type: TERNARY
+  }
+  match_fields {
+    id: 3
+    name: "meta.srcPort"
+    bitwidth: 16
+    match_type: TERNARY
+  }
+  match_fields {
+    id: 4
+    name: "meta.dstPort"
+    bitwidth: 16
+    match_type: TERNARY
+  }
+  match_fields {
+    id: 5
+    name: "meta.icmpId"
+    bitwidth: 16
+    match_type: TERNARY
+  }
+  match_fields {
+    id: 6
+    name: "hdr.ipv4.protocol"
+    bitwidth: 8
+    match_type: EXACT
+  }
+  action_refs {
+    id: 21257015
+  }
+  action_refs {
+    id: 23790902
+  }
+  action_refs {
+    id: 24328774
+  }
+  action_refs {
+    id: 16946221
+  }
+  direct_resource_ids: 320969974
+  size: 1024
+}
+tables {
+  preamble {
+    id: 46240823
+    name: "ingress.incoming_flow"
+    alias: "incoming_flow"
+  }
+  match_fields {
+    id: 1
+    name: "hdr.ipv4.srcAddr"
+    bitwidth: 32
+    match_type: TERNARY
+  }
+  match_fields {
+    id: 2
+    name: "hdr.ipv4.dstAddr"
+    bitwidth: 32
+    match_type: TERNARY
+  }
+  match_fields {
+    id: 3
+    name: "meta.srcPort"
+    bitwidth: 16
+    match_type: TERNARY
+  }
+  match_fields {
+    id: 4
+    name: "meta.dstPort"
+    bitwidth: 16
+    match_type: TERNARY
+  }
+  match_fields {
+    id: 5
+    name: "meta.icmpId"
+    bitwidth: 16
+    match_type: TERNARY
+  }
+  match_fields {
+    id: 6
+    name: "hdr.ipv4.protocol"
+    bitwidth: 8
+    match_type: EXACT
+  }
+  action_refs {
+    id: 21257015
+  }
+  action_refs {
+    id: 25769378
+  }
+  action_refs {
+    id: 20754032
+  }
+  action_refs {
+    id: 31879365
+  }
+  direct_resource_ids: 322927144
+  size: 1024
+}
+actions {
+  preamble {
+    id: 21257015
+    name: "NoAction"
+    alias: "NoAction"
+    annotations: "@noWarn(\"unused\")"
+  }
+}
+actions {
+  preamble {
+    id: 33281717
+    name: "ingress.drop"
+    alias: "drop"
+  }
+}
+actions {
+  preamble {
+    id: 23790902
+    name: "ingress.rewrite_tcp"
+    alias: "rewrite_tcp"
+  }
+  params {
+    id: 1
+    name: "newSrcAddr"
+    bitwidth: 32
+  }
+  params {
+    id: 2
+    name: "newSrcPort"
+    bitwidth: 16
+  }
+}
+actions {
+  preamble {
+    id: 24328774
+    name: "ingress.rewrite_udp"
+    alias: "rewrite_udp"
+  }
+  params {
+    id: 1
+    name: "newSrcAddr"
+    bitwidth: 32
+  }
+  params {
+    id: 2
+    name: "newSrcPort"
+    bitwidth: 16
+  }
+}
+actions {
+  preamble {
+    id: 16946221
+    name: "ingress.rewrite_icmp"
+    alias: "rewrite_icmp"
+  }
+  params {
+    id: 1
+    name: "newSrcAddr"
+    bitwidth: 32
+  }
+  params {
+    id: 2
+    name: "newIcmpId"
+    bitwidth: 16
+  }
+}
+actions {
+  preamble {
+    id: 25769378
+    name: "ingress.rewrite_tcp_dst"
+    alias: "rewrite_tcp_dst"
+  }
+  params {
+    id: 1
+    name: "newDstAddr"
+    bitwidth: 32
+  }
+  params {
+    id: 2
+    name: "newDstPort"
+    bitwidth: 16
+  }
+}
+actions {
+  preamble {
+    id: 20754032
+    name: "ingress.rewrite_udp_dst"
+    alias: "rewrite_udp_dst"
+  }
+  params {
+    id: 1
+    name: "newDstAddr"
+    bitwidth: 32
+  }
+  params {
+    id: 2
+    name: "newDstPort"
+    bitwidth: 16
+  }
+}
+actions {
+  preamble {
+    id: 31879365
+    name: "ingress.rewrite_icmp_dst"
+    alias: "rewrite_icmp_dst"
+  }
+  params {
+    id: 1
+    name: "newDstAddr"
+    bitwidth: 32
+  }
+  params {
+    id: 2
+    name: "newIcmpId"
+    bitwidth: 16
+  }
+}
+direct_counters {
+  preamble {
+    id: 320969974
+    name: "ingress.outgoing_flow_counter"
+    alias: "outgoing_flow_counter"
+  }
+  spec {
+    unit: PACKETS
+  }
+  direct_table_id: 38831791
+}
+direct_counters {
+  preamble {
+    id: 322927144
+    name: "ingress.incoming_flow_counter"
+    alias: "incoming_flow_counter"
+  }
+  spec {
+    unit: PACKETS
+  }
+  direct_table_id: 46240823
+}
+controller_packet_metadata {
+  preamble {
+    id: 80671331
+    name: "packet_in"
+    alias: "packet_in"
+    annotations: "@controller_header(\"packet_in\")"
+  }
+  metadata {
+    id: 1
+    name: "srcAddr"
+    bitwidth: 32
+  }
+  metadata {
+    id: 2
+    name: "srcPort"
+    bitwidth: 16
+  }
+  metadata {
+    id: 3
+    name: "dstAddr"
+    bitwidth: 32
+  }
+  metadata {
+    id: 4
+    name: "dstPort"
+    bitwidth: 16
+  }
+  metadata {
+    id: 5
+    name: "icmpId"
+    bitwidth: 16
+  }
+  metadata {
+    id: 6
+    name: "protocol"
+    bitwidth: 8
+  }
+}
+controller_packet_metadata {
+  preamble {
+    id: 75327753
+    name: "packet_out"
+    alias: "packet_out"
+    annotations: "@controller_header(\"packet_out\")"
+  }
+}
+type_info {
+}

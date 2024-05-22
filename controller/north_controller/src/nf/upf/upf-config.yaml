@@ -1,0 +1,14 @@
+nf:
+  host: upf1.upf.5gc.mnc099.mcc208.3gppnetwork.org
+  nrf_uri: http://nrf.5gc.mnc099.mcc208.3gppnetwork.org
+  name: upf1.upf.5gc.mnc099.mcc208.3gppnetwork.org
+  allowed_nssai: # type Vec<ExtSnssai>
+    - sst: 1
+      sd: '000001'
+    - sst: 1
+      sd: '000002'
+  nssai: # type Vec<ExtSnssai>
+    - sst: 1
+      sd: '000001'
+    - sst: 1
+      sd: '000002'

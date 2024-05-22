@@ -1,0 +1,1272 @@
+pkg_info {
+  arch: "v1model"
+}
+tables {
+  preamble {
+    id: 40988189
+    name: "UPFIngress.GTP_Action"
+    alias: "GTP_Action"
+  }
+  match_fields {
+    id: 1
+    name: "meta.seid"
+    bitwidth: 64
+    match_type: TERNARY
+  }
+  match_fields {
+    id: 2
+    name: "meta.pdr_id"
+    bitwidth: 16
+    match_type: TERNARY
+  }
+  action_refs {
+    id: 20880500
+  }
+  action_refs {
+    id: 33427904
+  }
+  action_refs {
+    id: 31003142
+  }
+  action_refs {
+    id: 18358832
+  }
+  action_refs {
+    id: 24497471
+  }
+  action_refs {
+    id: 31686839
+  }
+  action_refs {
+    id: 16783600
+  }
+  action_refs {
+    id: 17469153
+  }
+  action_refs {
+    id: 22304811
+  }
+  const_default_action_id: 22304811
+  direct_resource_ids: 354722337
+  size: 1024
+}
+tables {
+  preamble {
+    id: 47098276
+    name: "UPFIngress.GTP_Overlay_IPv4_UDP"
+    alias: "GTP_Overlay_IPv4_UDP"
+  }
+  match_fields {
+    id: 1
+    name: "meta.tunnel_teid"
+    bitwidth: 32
+    match_type: TERNARY
+  }
+  match_fields {
+    id: 2
+    name: "meta.tunnel_qfi"
+    bitwidth: 6
+    match_type: TERNARY
+  }
+  match_fields {
+    id: 3
+    name: "meta.seid"
+    bitwidth: 64
+    match_type: EXACT
+  }
+  match_fields {
+    id: 4
+    name: "hdr.overlay_ipv4.diffserv"
+    bitwidth: 8
+    match_type: TERNARY
+  }
+  match_fields {
+    id: 5
+    name: "hdr.overlay_ipv4.srcAddr"
+    bitwidth: 32
+    match_type: TERNARY
+  }
+  match_fields {
+    id: 6
+    name: "hdr.overlay_ipv4.dstAddr"
+    bitwidth: 32
+    match_type: TERNARY
+  }
+  match_fields {
+    id: 7
+    name: "hdr.overlay_udp.srcPort"
+    bitwidth: 16
+    match_type: RANGE
+  }
+  match_fields {
+    id: 8
+    name: "hdr.overlay_udp.dstPort"
+    bitwidth: 16
+    match_type: RANGE
+  }
+  action_refs {
+    id: 31659535
+  }
+  action_refs {
+    id: 30446676
+  }
+  action_refs {
+    id: 29900267
+  }
+  action_refs {
+    id: 22304811
+  }
+  const_default_action_id: 22304811
+  size: 1024
+}
+tables {
+  preamble {
+    id: 43332016
+    name: "UPFIngress.GTP_Overlay_IPv4_TCP"
+    alias: "GTP_Overlay_IPv4_TCP"
+  }
+  match_fields {
+    id: 1
+    name: "meta.tunnel_teid"
+    bitwidth: 32
+    match_type: TERNARY
+  }
+  match_fields {
+    id: 2
+    name: "meta.tunnel_qfi"
+    bitwidth: 6
+    match_type: TERNARY
+  }
+  match_fields {
+    id: 3
+    name: "meta.seid"
+    bitwidth: 64
+    match_type: EXACT
+  }
+  match_fields {
+    id: 4
+    name: "hdr.overlay_ipv4.diffserv"
+    bitwidth: 8
+    match_type: TERNARY
+  }
+  match_fields {
+    id: 5
+    name: "hdr.overlay_ipv4.srcAddr"
+    bitwidth: 32
+    match_type: TERNARY
+  }
+  match_fields {
+    id: 6
+    name: "hdr.overlay_ipv4.dstAddr"
+    bitwidth: 32
+    match_type: TERNARY
+  }
+  match_fields {
+    id: 7
+    name: "hdr.overlay_tcp.srcPort"
+    bitwidth: 16
+    match_type: RANGE
+  }
+  match_fields {
+    id: 8
+    name: "hdr.overlay_tcp.dstPort"
+    bitwidth: 16
+    match_type: RANGE
+  }
+  action_refs {
+    id: 31659535
+  }
+  action_refs {
+    id: 30446676
+  }
+  action_refs {
+    id: 29900267
+  }
+  action_refs {
+    id: 22304811
+  }
+  const_default_action_id: 22304811
+  size: 1024
+}
+tables {
+  preamble {
+    id: 40308405
+    name: "UPFIngress.GTP_Overlay_IPv4_Default"
+    alias: "GTP_Overlay_IPv4_Default"
+  }
+  match_fields {
+    id: 1
+    name: "meta.tunnel_teid"
+    bitwidth: 32
+    match_type: TERNARY
+  }
+  match_fields {
+    id: 2
+    name: "meta.tunnel_qfi"
+    bitwidth: 6
+    match_type: TERNARY
+  }
+  match_fields {
+    id: 3
+    name: "meta.seid"
+    bitwidth: 64
+    match_type: EXACT
+  }
+  match_fields {
+    id: 4
+    name: "hdr.overlay_ipv4.diffserv"
+    bitwidth: 8
+    match_type: TERNARY
+  }
+  match_fields {
+    id: 5
+    name: "hdr.overlay_ipv4.srcAddr"
+    bitwidth: 32
+    match_type: TERNARY
+  }
+  match_fields {
+    id: 6
+    name: "hdr.overlay_ipv4.dstAddr"
+    bitwidth: 32
+    match_type: TERNARY
+  }
+  match_fields {
+    id: 7
+    name: "hdr.overlay_ipv4.protocol"
+    bitwidth: 8
+    match_type: TERNARY
+  }
+  action_refs {
+    id: 31659535
+  }
+  action_refs {
+    id: 30446676
+  }
+  action_refs {
+    id: 29900267
+  }
+  action_refs {
+    id: 22304811
+  }
+  const_default_action_id: 22304811
+  size: 1024
+}
+tables {
+  preamble {
+    id: 48791161
+    name: "UPFIngress.GTP_Overlay_IPv6_UDP"
+    alias: "GTP_Overlay_IPv6_UDP"
+  }
+  match_fields {
+    id: 1
+    name: "meta.tunnel_teid"
+    bitwidth: 32
+    match_type: TERNARY
+  }
+  match_fields {
+    id: 2
+    name: "meta.tunnel_qfi"
+    bitwidth: 6
+    match_type: TERNARY
+  }
+  match_fields {
+    id: 3
+    name: "meta.seid"
+    bitwidth: 64
+    match_type: EXACT
+  }
+  match_fields {
+    id: 4
+    name: "hdr.overlay_ipv6.trafficClass"
+    bitwidth: 8
+    match_type: TERNARY
+  }
+  match_fields {
+    id: 5
+    name: "hdr.overlay_ipv6.srcAddr"
+    bitwidth: 128
+    match_type: TERNARY
+  }
+  match_fields {
+    id: 6
+    name: "hdr.overlay_ipv6.dstAddr"
+    bitwidth: 128
+    match_type: TERNARY
+  }
+  match_fields {
+    id: 7
+    name: "hdr.overlay_udp.srcPort"
+    bitwidth: 16
+    match_type: RANGE
+  }
+  match_fields {
+    id: 8
+    name: "hdr.overlay_udp.dstPort"
+    bitwidth: 16
+    match_type: RANGE
+  }
+  action_refs {
+    id: 31659535
+  }
+  action_refs {
+    id: 30446676
+  }
+  action_refs {
+    id: 29900267
+  }
+  action_refs {
+    id: 22304811
+  }
+  const_default_action_id: 22304811
+  size: 1024
+}
+tables {
+  preamble {
+    id: 50273453
+    name: "UPFIngress.GTP_Overlay_IPv6_TCP"
+    alias: "GTP_Overlay_IPv6_TCP"
+  }
+  match_fields {
+    id: 1
+    name: "meta.tunnel_teid"
+    bitwidth: 32
+    match_type: TERNARY
+  }
+  match_fields {
+    id: 2
+    name: "meta.tunnel_qfi"
+    bitwidth: 6
+    match_type: TERNARY
+  }
+  match_fields {
+    id: 3
+    name: "meta.seid"
+    bitwidth: 64
+    match_type: EXACT
+  }
+  match_fields {
+    id: 4
+    name: "hdr.overlay_ipv6.trafficClass"
+    bitwidth: 8
+    match_type: TERNARY
+  }
+  match_fields {
+    id: 5
+    name: "hdr.overlay_ipv6.srcAddr"
+    bitwidth: 128
+    match_type: TERNARY
+  }
+  match_fields {
+    id: 6
+    name: "hdr.overlay_ipv6.dstAddr"
+    bitwidth: 128
+    match_type: TERNARY
+  }
+  match_fields {
+    id: 7
+    name: "hdr.overlay_tcp.srcPort"
+    bitwidth: 16
+    match_type: RANGE
+  }
+  match_fields {
+    id: 8
+    name: "hdr.overlay_tcp.dstPort"
+    bitwidth: 16
+    match_type: RANGE
+  }
+  action_refs {
+    id: 31659535
+  }
+  action_refs {
+    id: 30446676
+  }
+  action_refs {
+    id: 29900267
+  }
+  action_refs {
+    id: 22304811
+  }
+  const_default_action_id: 22304811
+  size: 1024
+}
+tables {
+  preamble {
+    id: 40932299
+    name: "UPFIngress.GTP_Overlay_IPv6_Default"
+    alias: "GTP_Overlay_IPv6_Default"
+  }
+  match_fields {
+    id: 1
+    name: "meta.tunnel_teid"
+    bitwidth: 32
+    match_type: TERNARY
+  }
+  match_fields {
+    id: 2
+    name: "meta.tunnel_qfi"
+    bitwidth: 6
+    match_type: TERNARY
+  }
+  match_fields {
+    id: 3
+    name: "meta.seid"
+    bitwidth: 64
+    match_type: EXACT
+  }
+  match_fields {
+    id: 4
+    name: "hdr.overlay_ipv6.trafficClass"
+    bitwidth: 8
+    match_type: TERNARY
+  }
+  match_fields {
+    id: 5
+    name: "hdr.overlay_ipv6.srcAddr"
+    bitwidth: 128
+    match_type: TERNARY
+  }
+  match_fields {
+    id: 6
+    name: "hdr.overlay_ipv6.dstAddr"
+    bitwidth: 128
+    match_type: TERNARY
+  }
+  match_fields {
+    id: 7
+    name: "hdr.overlay_ipv6.nextHdr"
+    bitwidth: 8
+    match_type: TERNARY
+  }
+  action_refs {
+    id: 31659535
+  }
+  action_refs {
+    id: 30446676
+  }
+  action_refs {
+    id: 29900267
+  }
+  action_refs {
+    id: 22304811
+  }
+  const_default_action_id: 22304811
+  size: 1024
+}
+tables {
+  preamble {
+    id: 49929212
+    name: "UPFIngress.GTP_IPv4"
+    alias: "GTP_IPv4"
+  }
+  match_fields {
+    id: 1
+    name: "meta.tunnel_ipv4_addr"
+    bitwidth: 32
+    match_type: TERNARY
+  }
+  match_fields {
+    id: 2
+    name: "meta.tunnel_teid"
+    bitwidth: 32
+    match_type: EXACT
+  }
+  action_refs {
+    id: 28563249
+  }
+  action_refs {
+    id: 22304811
+  }
+  const_default_action_id: 22304811
+  size: 1024
+}
+tables {
+  preamble {
+    id: 50039808
+    name: "UPFIngress.GTP_IPv6"
+    alias: "GTP_IPv6"
+  }
+  match_fields {
+    id: 1
+    name: "meta.tunnel_ipv6_addr"
+    bitwidth: 128
+    match_type: TERNARY
+  }
+  match_fields {
+    id: 2
+    name: "meta.tunnel_teid"
+    bitwidth: 32
+    match_type: EXACT
+  }
+  action_refs {
+    id: 28563249
+  }
+  action_refs {
+    id: 22304811
+  }
+  const_default_action_id: 22304811
+  size: 1024
+}
+tables {
+  preamble {
+    id: 33622256
+    name: "UPFIngress.N6_Action"
+    alias: "N6_Action"
+  }
+  match_fields {
+    id: 1
+    name: "meta.seid"
+    bitwidth: 64
+    match_type: TERNARY
+  }
+  match_fields {
+    id: 2
+    name: "meta.pdr_id"
+    bitwidth: 16
+    match_type: TERNARY
+  }
+  action_refs {
+    id: 17089995
+  }
+  action_refs {
+    id: 17456606
+  }
+  action_refs {
+    id: 16783600
+  }
+  action_refs {
+    id: 17469153
+  }
+  action_refs {
+    id: 22304811
+  }
+  const_default_action_id: 22304811
+  direct_resource_ids: 354562111
+  size: 1024
+}
+tables {
+  preamble {
+    id: 34554403
+    name: "UPFIngress.N6_IPv4_UDP"
+    alias: "N6_IPv4_UDP"
+  }
+  match_fields {
+    id: 1
+    name: "hdr.overlay_ipv4.diffserv"
+    bitwidth: 8
+    match_type: TERNARY
+  }
+  match_fields {
+    id: 2
+    name: "hdr.overlay_ipv4.srcAddr"
+    bitwidth: 32
+    match_type: TERNARY
+  }
+  match_fields {
+    id: 3
+    name: "hdr.overlay_ipv4.dstAddr"
+    bitwidth: 32
+    match_type: TERNARY
+  }
+  match_fields {
+    id: 4
+    name: "hdr.overlay_udp.srcPort"
+    bitwidth: 16
+    match_type: RANGE
+  }
+  match_fields {
+    id: 5
+    name: "hdr.overlay_udp.dstPort"
+    bitwidth: 16
+    match_type: RANGE
+  }
+  action_refs {
+    id: 16844878
+  }
+  action_refs {
+    id: 22304811
+  }
+  const_default_action_id: 22304811
+  size: 1024
+}
+tables {
+  preamble {
+    id: 33785993
+    name: "UPFIngress.N6_IPv4_TCP"
+    alias: "N6_IPv4_TCP"
+  }
+  match_fields {
+    id: 1
+    name: "hdr.overlay_ipv4.diffserv"
+    bitwidth: 8
+    match_type: TERNARY
+  }
+  match_fields {
+    id: 2
+    name: "hdr.overlay_ipv4.srcAddr"
+    bitwidth: 32
+    match_type: TERNARY
+  }
+  match_fields {
+    id: 3
+    name: "hdr.overlay_ipv4.dstAddr"
+    bitwidth: 32
+    match_type: TERNARY
+  }
+  match_fields {
+    id: 4
+    name: "hdr.overlay_tcp.srcPort"
+    bitwidth: 16
+    match_type: RANGE
+  }
+  match_fields {
+    id: 5
+    name: "hdr.overlay_tcp.dstPort"
+    bitwidth: 16
+    match_type: RANGE
+  }
+  action_refs {
+    id: 16844878
+  }
+  action_refs {
+    id: 22304811
+  }
+  const_default_action_id: 22304811
+  size: 1024
+}
+tables {
+  preamble {
+    id: 44137958
+    name: "UPFIngress.N6_IPv4_Default"
+    alias: "N6_IPv4_Default"
+  }
+  match_fields {
+    id: 1
+    name: "hdr.overlay_ipv4.diffserv"
+    bitwidth: 8
+    match_type: TERNARY
+  }
+  match_fields {
+    id: 2
+    name: "hdr.overlay_ipv4.srcAddr"
+    bitwidth: 32
+    match_type: TERNARY
+  }
+  match_fields {
+    id: 3
+    name: "hdr.overlay_ipv4.dstAddr"
+    bitwidth: 32
+    match_type: TERNARY
+  }
+  match_fields {
+    id: 4
+    name: "hdr.overlay_ipv4.protocol"
+    bitwidth: 8
+    match_type: TERNARY
+  }
+  action_refs {
+    id: 16844878
+  }
+  action_refs {
+    id: 22304811
+  }
+  const_default_action_id: 22304811
+  size: 1024
+}
+tables {
+  preamble {
+    id: 37324991
+    name: "UPFIngress.N6_IPv6_UDP"
+    alias: "N6_IPv6_UDP"
+  }
+  match_fields {
+    id: 1
+    name: "hdr.overlay_ipv6.trafficClass"
+    bitwidth: 8
+    match_type: TERNARY
+  }
+  match_fields {
+    id: 2
+    name: "hdr.overlay_ipv6.srcAddr"
+    bitwidth: 128
+    match_type: TERNARY
+  }
+  match_fields {
+    id: 3
+    name: "hdr.overlay_ipv6.dstAddr"
+    bitwidth: 128
+    match_type: TERNARY
+  }
+  match_fields {
+    id: 4
+    name: "hdr.overlay_udp.srcPort"
+    bitwidth: 16
+    match_type: RANGE
+  }
+  match_fields {
+    id: 5
+    name: "hdr.overlay_udp.dstPort"
+    bitwidth: 16
+    match_type: RANGE
+  }
+  action_refs {
+    id: 16844878
+  }
+  action_refs {
+    id: 22304811
+  }
+  const_default_action_id: 22304811
+  size: 1024
+}
+tables {
+  preamble {
+    id: 46774224
+    name: "UPFIngress.N6_IPv6_TCP"
+    alias: "N6_IPv6_TCP"
+  }
+  match_fields {
+    id: 1
+    name: "hdr.overlay_ipv6.trafficClass"
+    bitwidth: 8
+    match_type: TERNARY
+  }
+  match_fields {
+    id: 2
+    name: "hdr.overlay_ipv6.srcAddr"
+    bitwidth: 128
+    match_type: TERNARY
+  }
+  match_fields {
+    id: 3
+    name: "hdr.overlay_ipv6.dstAddr"
+    bitwidth: 128
+    match_type: TERNARY
+  }
+  match_fields {
+    id: 4
+    name: "hdr.overlay_tcp.srcPort"
+    bitwidth: 16
+    match_type: RANGE
+  }
+  match_fields {
+    id: 5
+    name: "hdr.overlay_tcp.dstPort"
+    bitwidth: 16
+    match_type: RANGE
+  }
+  action_refs {
+    id: 16844878
+  }
+  action_refs {
+    id: 22304811
+  }
+  const_default_action_id: 22304811
+  size: 1024
+}
+tables {
+  preamble {
+    id: 43124078
+    name: "UPFIngress.N6_IPv6_Default"
+    alias: "N6_IPv6_Default"
+  }
+  match_fields {
+    id: 1
+    name: "hdr.overlay_ipv6.trafficClass"
+    bitwidth: 8
+    match_type: TERNARY
+  }
+  match_fields {
+    id: 2
+    name: "hdr.overlay_ipv6.srcAddr"
+    bitwidth: 128
+    match_type: TERNARY
+  }
+  match_fields {
+    id: 3
+    name: "hdr.overlay_ipv6.dstAddr"
+    bitwidth: 128
+    match_type: TERNARY
+  }
+  match_fields {
+    id: 4
+    name: "hdr.overlay_ipv6.nextHdr"
+    bitwidth: 8
+    match_type: TERNARY
+  }
+  action_refs {
+    id: 16844878
+  }
+  action_refs {
+    id: 22304811
+  }
+  const_default_action_id: 22304811
+  size: 1024
+}
+actions {
+  preamble {
+    id: 28265776
+    name: "UPFIngress.gtpu_echo_response"
+    alias: "gtpu_echo_response"
+  }
+}
+actions {
+  preamble {
+    id: 22304811
+    name: "UPFIngress.drop"
+    alias: "drop"
+  }
+}
+actions {
+  preamble {
+    id: 17469153
+    name: "UPFIngress.send_to_control_plane"
+    alias: "send_to_control_plane"
+  }
+  params {
+    id: 1
+    name: "seid"
+    bitwidth: 64
+  }
+  params {
+    id: 2
+    name: "pdr_id"
+    bitwidth: 16
+  }
+}
+actions {
+  preamble {
+    id: 16783600
+    name: "UPFIngress.buffer_and_notify_cp"
+    alias: "buffer_and_notify_cp"
+  }
+  params {
+    id: 1
+    name: "seid"
+    bitwidth: 64
+  }
+  params {
+    id: 2
+    name: "pdr_id"
+    bitwidth: 16
+  }
+}
+actions {
+  preamble {
+    id: 28563249
+    name: "UPFIngress.set_seid"
+    alias: "set_seid"
+  }
+  params {
+    id: 1
+    name: "seid"
+    bitwidth: 64
+  }
+}
+actions {
+  preamble {
+    id: 31659535
+    name: "UPFIngress.set_pdr_id"
+    alias: "set_pdr_id"
+  }
+  params {
+    id: 1
+    name: "pdr_id"
+    bitwidth: 16
+  }
+}
+actions {
+  preamble {
+    id: 30446676
+    name: "UPFIngress.set_pdr_id_remove_tunnel"
+    alias: "set_pdr_id_remove_tunnel"
+  }
+  params {
+    id: 1
+    name: "pdr_id"
+    bitwidth: 16
+  }
+}
+actions {
+  preamble {
+    id: 29900267
+    name: "UPFIngress.set_pdr_id_remove_tunnel_and_extheader"
+    alias: "set_pdr_id_remove_tunnel_and_extheader"
+  }
+  params {
+    id: 1
+    name: "pdr_id"
+    bitwidth: 16
+  }
+}
+actions {
+  preamble {
+    id: 33427904
+    name: "UPFIngress.send_to_access_create_gtpu_tunnel_ipv4"
+    alias: "send_to_access_create_gtpu_tunnel_ipv4"
+  }
+  params {
+    id: 1
+    name: "mark_tos"
+    bitwidth: 1
+  }
+  params {
+    id: 2
+    name: "tos"
+    bitwidth: 8
+  }
+  params {
+    id: 3
+    name: "upf_ip"
+    bitwidth: 32
+  }
+  params {
+    id: 4
+    name: "gtpu_teid"
+    bitwidth: 32
+  }
+  params {
+    id: 5
+    name: "gtpu_ip"
+    bitwidth: 32
+  }
+  params {
+    id: 6
+    name: "set_qfi"
+    bitwidth: 1
+  }
+  params {
+    id: 7
+    name: "gtpu_qfi"
+    bitwidth: 6
+  }
+}
+actions {
+  preamble {
+    id: 18358832
+    name: "UPFIngress.send_to_access_create_gtpu_tunnel_ipv6"
+    alias: "send_to_access_create_gtpu_tunnel_ipv6"
+  }
+  params {
+    id: 1
+    name: "mark_tos"
+    bitwidth: 1
+  }
+  params {
+    id: 2
+    name: "tos"
+    bitwidth: 8
+  }
+  params {
+    id: 3
+    name: "upf_ip"
+    bitwidth: 128
+  }
+  params {
+    id: 4
+    name: "gtpu_teid"
+    bitwidth: 32
+  }
+  params {
+    id: 5
+    name: "gtpu_ip"
+    bitwidth: 128
+  }
+  params {
+    id: 6
+    name: "set_qfi"
+    bitwidth: 1
+  }
+  params {
+    id: 7
+    name: "gtpu_qfi"
+    bitwidth: 6
+  }
+}
+actions {
+  preamble {
+    id: 31003142
+    name: "UPFIngress.send_to_core_create_gtpu_tunnel_ipv4"
+    alias: "send_to_core_create_gtpu_tunnel_ipv4"
+  }
+  params {
+    id: 1
+    name: "mark_tos"
+    bitwidth: 1
+  }
+  params {
+    id: 2
+    name: "tos"
+    bitwidth: 8
+  }
+  params {
+    id: 3
+    name: "upf_ip"
+    bitwidth: 32
+  }
+  params {
+    id: 4
+    name: "gtpu_teid"
+    bitwidth: 32
+  }
+  params {
+    id: 5
+    name: "gtpu_ip"
+    bitwidth: 32
+  }
+  params {
+    id: 6
+    name: "set_qfi"
+    bitwidth: 1
+  }
+  params {
+    id: 7
+    name: "gtpu_qfi"
+    bitwidth: 6
+  }
+}
+actions {
+  preamble {
+    id: 24497471
+    name: "UPFIngress.send_to_core_create_gtpu_tunnel_ipv6"
+    alias: "send_to_core_create_gtpu_tunnel_ipv6"
+  }
+  params {
+    id: 1
+    name: "mark_tos"
+    bitwidth: 1
+  }
+  params {
+    id: 2
+    name: "tos"
+    bitwidth: 8
+  }
+  params {
+    id: 3
+    name: "upf_ip"
+    bitwidth: 128
+  }
+  params {
+    id: 4
+    name: "gtpu_teid"
+    bitwidth: 32
+  }
+  params {
+    id: 5
+    name: "gtpu_ip"
+    bitwidth: 128
+  }
+  params {
+    id: 6
+    name: "set_qfi"
+    bitwidth: 1
+  }
+  params {
+    id: 7
+    name: "gtpu_qfi"
+    bitwidth: 6
+  }
+}
+actions {
+  preamble {
+    id: 20880500
+    name: "UPFIngress.send_to_access"
+    alias: "send_to_access"
+  }
+  params {
+    id: 1
+    name: "mark_tos"
+    bitwidth: 1
+  }
+  params {
+    id: 2
+    name: "tos"
+    bitwidth: 8
+  }
+}
+actions {
+  preamble {
+    id: 31686839
+    name: "UPFIngress.send_to_core"
+    alias: "send_to_core"
+  }
+  params {
+    id: 1
+    name: "mark_tos"
+    bitwidth: 1
+  }
+  params {
+    id: 2
+    name: "tos"
+    bitwidth: 8
+  }
+}
+actions {
+  preamble {
+    id: 17089995
+    name: "UPFIngress.create_gtpu_header_dl_ipv4"
+    alias: "create_gtpu_header_dl_ipv4"
+  }
+  params {
+    id: 1
+    name: "mark_tos"
+    bitwidth: 1
+  }
+  params {
+    id: 2
+    name: "tos_value"
+    bitwidth: 8
+  }
+  params {
+    id: 3
+    name: "upf_ip"
+    bitwidth: 32
+  }
+  params {
+    id: 4
+    name: "gtpu_teid"
+    bitwidth: 32
+  }
+  params {
+    id: 5
+    name: "gtpu_ip"
+    bitwidth: 32
+  }
+  params {
+    id: 6
+    name: "gtpu_qfi"
+    bitwidth: 6
+  }
+}
+actions {
+  preamble {
+    id: 17456606
+    name: "UPFIngress.create_gtpu_header_dl_ipv6"
+    alias: "create_gtpu_header_dl_ipv6"
+  }
+  params {
+    id: 1
+    name: "mark_tos"
+    bitwidth: 1
+  }
+  params {
+    id: 2
+    name: "tos_value"
+    bitwidth: 8
+  }
+  params {
+    id: 3
+    name: "upf_ip"
+    bitwidth: 128
+  }
+  params {
+    id: 4
+    name: "gtpu_teid"
+    bitwidth: 32
+  }
+  params {
+    id: 5
+    name: "gtpu_ip"
+    bitwidth: 128
+  }
+  params {
+    id: 6
+    name: "gtpu_qfi"
+    bitwidth: 6
+  }
+}
+actions {
+  preamble {
+    id: 16844878
+    name: "UPFIngress.set_pdr_id_and_seid"
+    alias: "set_pdr_id_and_seid"
+  }
+  params {
+    id: 1
+    name: "seid"
+    bitwidth: 64
+  }
+  params {
+    id: 2
+    name: "pdr_id"
+    bitwidth: 16
+  }
+}
+direct_meters {
+  preamble {
+    id: 354722337
+    name: "UPFIngress.ul_meter"
+    alias: "ul_meter"
+  }
+  spec {
+    unit: BYTES
+  }
+  direct_table_id: 40988189
+}
+direct_meters {
+  preamble {
+    id: 354562111
+    name: "UPFIngress.dl_meter"
+    alias: "dl_meter"
+  }
+  spec {
+    unit: BYTES
+  }
+  direct_table_id: 33622256
+}
+controller_packet_metadata {
+  preamble {
+    id: 80671331
+    name: "packet_in"
+    alias: "packet_in"
+    annotations: "@controller_header(\"packet_in\")"
+  }
+  metadata {
+    id: 1
+    name: "ingress_port"
+    bitwidth: 9
+  }
+  metadata {
+    id: 2
+    name: "padding"
+    bitwidth: 7
+  }
+  metadata {
+    id: 3
+    name: "seid"
+    bitwidth: 64
+  }
+  metadata {
+    id: 4
+    name: "pdr_id"
+    bitwidth: 16
+  }
+  metadata {
+    id: 5
+    name: "flag"
+    bitwidth: 8
+  }
+}
+controller_packet_metadata {
+  preamble {
+    id: 75327753
+    name: "packet_out"
+    alias: "packet_out"
+    annotations: "@controller_header(\"packet_out\")"
+  }
+  metadata {
+    id: 1
+    name: "ingress_port"
+    bitwidth: 9
+  }
+  metadata {
+    id: 2
+    name: "padding"
+    bitwidth: 7
+  }
+  metadata {
+    id: 3
+    name: "flag"
+    bitwidth: 8
+  }
+}
+type_info {
+}

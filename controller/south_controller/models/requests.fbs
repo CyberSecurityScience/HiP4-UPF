@@ -1,0 +1,81 @@
+
+namespace UPFDriver.Requests;
+
+table DL_N6_SimpleInsertRequest {
+    key_ipv4    : uint32;
+    data_ma_id  : uint32;
+    data_teid   : uint32;
+    data_qer_id : uint16;
+}
+
+table DL_N6_SimpleUpdateRequest {
+    key_ipv4       : uint32;
+    data_ma_id     : uint32;
+    data_old_ma_id : uint32;
+    data_teid      : uint32;
+    data_qer_id    : uint16;
+}
+
+table DL_N6_SimpleRemoveRequest {
+    key_ipv4       : uint32;
+    data_old_ma_id : uint32;
+}
+
+table UL_N6_SimpleInsertRequest {
+    key_teid    : uint32;
+    key_qfi     : uint8;
+    data_ma_id  : uint32;
+    data_qer_id : uint16;
+}
+
+table UL_N6_SimpleUpdateRequest {
+    key_teid       : uint32;
+    key_qfi        : uint8;
+    data_ma_id     : uint32;
+    data_old_ma_id : uint32;
+    data_qer_id    : uint16;
+}
+
+table UL_N6_SimpleRemoveRequest {
+    key_teid       : uint32;
+    key_qfi        : uint8;
+    data_old_ma_id : uint32;
+}
+
+table InsertOrUpdatePerMaidURR {
+    ma_id        : uint32;
+
+    vol_thres    : uint64;
+    vol_thres_id : uint32;
+
+    time_thres   : uint64; // min of all time based rules
+    period_val   : uint64; // GCD of all period rules
+
+    // 8-bit flags
+    // bit 0: if set, indicate this is an insert, meaning it will followed by an PDR update. Otherwise it is an update to an existing URR, e.g. set new threshold
+    // bit 1: if set, time/period based measurement will start immediately, otherwise it will only start after first packet is detected
+    flags        : uint8;
+}
+
+union RequestUnion {
+    DL_N6_SimpleInsertRequest,
+    DL_N6_SimpleUpdateRequest,
+    DL_N6_SimpleRemoveRequest,
+    UL_N6_SimpleInsertRequest,
+    UL_N6_SimpleUpdateRequest,
+    UL_N6_SimpleRemoveRequest,
+
+    InsertOrUpdatePerMaidURR,
+}
+
+table Request {
+    request: RequestUnion;
+}
+
+table Transaction {
+    transaction_id : uint32;
+    deadline       : uint64;
+    ops            : [Request];
+}
+
+root_type Transaction;

@@ -1,0 +1,71 @@
+nf:
+  allowed_nssai:
+  - sd: '000001'
+    sst: 1
+  - sd: '000002'
+    sst: 1
+  host: 192.168.67.135
+  name: upf1.upf.5gc.mnc099.mcc208.3gppnetwork.org
+  nrf_uri: http://172.18.0.3:80
+  nssai:
+  - sd: '000001'
+    sst: 1
+  - sd: '000002'
+    sst: 1
+upf:
+  cpu_pcie_ifname: disabled
+  cpu_pcie_port: 192
+  dataplane_ip: 10.99.0.5
+  enable_deferred_id_del: true
+  enable_qos: true
+  enable_univmon: false
+  ports:
+  - max_bitrate_kbps: 100000000
+    ports_in_group:
+    - 148
+    - 149
+    - 150
+    - 151
+  - max_bitrate_kbps: 10000000
+    ports_in_group:
+    - 164
+    - 165
+    - 166
+    - 167
+  qos:
+  - gbr: false
+    importance: 1
+    qfi: 1
+    sojourn_target_us: 300
+    target_probability: 99.9
+  - gbr: false
+    importance: 100
+    qfi: 23
+    sojourn_target_us: 200
+    target_probability: 99.9
+  qos_update_period: 30
+  routing:
+  - cidr: 0.0.0.0/0
+    device_port: 1
+    dst_mac: b8:ce:f6:3d:f9:42
+    interface: N6
+    src_mac: 02:42:f5:d0:f4:59
+  - cidr: 0.0.0.0/0
+    device_port: 0
+    dst_mac: 08:c0:eb:f7:20:63
+    interface: N3
+    src_mac: 02:42:f5:d0:f4:59
+  urr_cfg:
+    allow_neg_countdown: false
+    auto_countdown_offset: 0
+    auto_countdown_update_freq_ms: 1000
+    countdown_ms: 0
+    ema_value: 0.5
+    enable_auto_countdown: true
+    enable_delayed_countdown: false
+    enable_volume_estimation: true
+    enter_slow_pull_mode_est_pull_distance: 3
+    enter_slow_pull_mode_rounds: 3
+    max_update_delay_ms: 10
+    pull_round_time_ms: 200
+    slow_pull_mode_delayed_rounds: 3
