@@ -1,0 +1,19 @@
+original:
+simple: 169
+other 8
+
+egress split to 4 tables && ingress split into 4 tables:
+simple: 157
+other 8
+
+egress split to 4 tables && ingress split into 2 tables:
+simple: 157
+other 8
+
+egress split to 2 tables && ingress split into 2 tables:
+simple: 160
+other 8
+
+egress split to 2 tables && ingress split into 4 tables:
+simple: 157
+other 8

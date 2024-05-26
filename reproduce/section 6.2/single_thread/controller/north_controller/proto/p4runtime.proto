@@ -1,0 +1,1486 @@
+// Copyright (c) 2016, Google Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+// This package and its contents are a work-in-progress.
+
+package p4.v1;
+
+option go_package = "github.com/p4lang/p4runtime/go/p4/v1";
+option cc_enable_arenas = true;
+
+// P4 type specs ---------------------------------------------------------------
+
+// From the P4_16 spec:
+/* |--------------------|--------------------------------------------|
+ * |                    | Container type                             |
+ * | Element type       |-----------|--------------|-----------------|
+ * |                    | header    | header_union | struct or tuple |
+ * |--------------------|-----------|--------------|-----------------|
+ * | bit<W>             | allowed   | error        | allowed         |
+ * | int<W>             | allowed   | error        | allowed         |
+ * | varbit<W>          | allowed   | error        | allowed         |
+ * | int                | error     | error        | error           |
+ * | void               | error     | error        | error           |
+ * | error              | error     | error        | allowed         |
+ * | match_kind         | error     | error        | error           |
+ * | bool               | error     | error        | allowed         |
+ * | enum               | allowed*  | error        | allowed         |
+ * | header             | error     | allowed      | allowed         |
+ * | header stack       | error     | error        | allowed         |
+ * | header_union       | error     | error        | allowed         |
+ * | struct             | error     | error        | allowed         |
+ * | tuple              | error     | error        | allowed         |
+ * |--------------------|-----------|--------------|-----------------|
+ *
+ * *if serializable
+ */
+
+// These P4 types (struct, header_type, header_union and enum) are guaranteed to
+// have a fully-qualified name (e.g. you cannot use an anonymous struct to
+// declare a variable like in C). Instead of duplicating the type spec for these
+// every time the type is used, we include the type spec once in this P4TypeInfo
+// message and refer to the types by name in the P4DataTypeSpec message. We also
+// support annotations for these type specs which can be useful, e.g. to
+// identify well-known headers (such as ipv4).
+message P4TypeInfo {
+  map<string, P4StructTypeSpec> structs = 1;
+  map<string, P4HeaderTypeSpec> headers = 2;
+  map<string, P4HeaderUnionTypeSpec> header_unions = 3;
+  map<string, P4EnumTypeSpec> enums = 4;
+  P4ErrorTypeSpec error = 5;
+  map<string, P4SerializableEnumTypeSpec> serializable_enums = 6;
+  map<string, P4NewTypeSpec> new_types = 7;
+}
+
+// Describes a P4_16 type.
+message P4DataTypeSpec {
+  oneof type_spec {
+    P4BitstringLikeTypeSpec bitstring = 1;
+    P4BoolType bool = 2;
+    P4TupleTypeSpec tuple = 3;
+    P4NamedType struct = 4;
+    P4NamedType header = 5;
+    P4NamedType header_union = 6;
+    P4HeaderStackTypeSpec header_stack = 7;
+    P4HeaderUnionStackTypeSpec header_union_stack = 8;
+    P4NamedType enum = 9;
+    P4ErrorType error = 10;
+    P4NamedType serializable_enum = 11;
+    P4NamedType new_type = 12;
+  }
+}
+
+message P4NamedType {
+  string name = 1;
+}
+
+// Empty message as no type information needed, just used as a placeholder in
+// the oneof to identify boolean types.
+message P4BoolType { }
+
+message P4ErrorType { }
+
+message P4BitstringLikeTypeSpec {
+  oneof type_spec {
+    P4BitTypeSpec bit = 1;  // bit<W>
+    P4IntTypeSpec int = 2;  // int<W>
+    P4VarbitTypeSpec varbit = 3;  // varbit<W>
+  }
+  // Useful to identify well-known types, such as IP address or Ethernet MAC
+  // address.
+  repeated string annotations = 4;
+  // Optional. If present, the location of `annotations[i]` is given by
+ // `annotation_locations[i]`.
+  repeated SourceLocation annotation_locations = 5;
+  repeated StructuredAnnotation structured_annotations = 6;
+}
+
+message P4BitTypeSpec {
+  int32 bitwidth = 1;
+}
+
+message P4IntTypeSpec {
+  int32 bitwidth = 1;
+}
+
+message P4VarbitTypeSpec {
+  int32 max_bitwidth = 1;
+}
+
+// From the P4_16 spec: "A tuple is similar to a struct, in that it holds
+// multiple values. Unlike a struct type, tuples have no named fields."
+message P4TupleTypeSpec {
+  repeated P4DataTypeSpec members = 1;
+}
+
+message P4StructTypeSpec {
+  message Member {
+    string name = 1;
+    P4DataTypeSpec type_spec = 2;
+  }
+  repeated Member members = 1;
+  repeated string annotations = 2;
+  // Optional. If present, the location of `annotations[i]` is given by
+ // `annotation_locations[i]`.
+  repeated SourceLocation annotation_locations = 3;
+  repeated StructuredAnnotation structured_annotations = 4;
+}
+
+message P4HeaderTypeSpec {
+  message Member {
+    string name = 1;
+    P4BitstringLikeTypeSpec type_spec = 2;
+  }
+  repeated Member members = 1;
+  repeated string annotations = 2;
+  // Optional. If present, the location of `annotations[i]` is given by
+ // `annotation_locations[i]`.
+  repeated SourceLocation annotation_locations = 3;
+  repeated StructuredAnnotation structured_annotations = 4;
+}
+
+message P4HeaderUnionTypeSpec {
+  message Member {
+    string name = 1;
+    P4NamedType header = 2;
+  }
+  repeated Member members = 1;
+  repeated string annotations = 2;
+  // Optional. If present, the location of `annotations[i]` is given by
+ // `annotation_locations[i]`.
+  repeated SourceLocation annotation_locations = 3;
+  repeated StructuredAnnotation structured_annotations = 4;
+}
+
+message P4HeaderStackTypeSpec {
+  P4NamedType header = 1;
+  int32 size = 2;
+}
+
+message P4HeaderUnionStackTypeSpec {
+  P4NamedType header_union = 1;
+  int32 size = 2;
+}
+
+message KeyValuePair {
+  string key = 1;
+  Expression value = 2;
+}
+
+message KeyValuePairList {
+  repeated KeyValuePair kv_pairs = 1;
+}
+
+message Expression {
+  oneof value {
+    string string_value = 1;
+    int64 int64_value = 2;
+    bool bool_value = 3;
+  }
+}
+
+message ExpressionList {
+  repeated Expression expressions = 1;
+}
+
+message StructuredAnnotation {
+  string name = 1;
+  oneof body {
+    ExpressionList expression_list = 2;
+    KeyValuePairList kv_pair_list = 3;
+  }
+  // Optional. Location of the '@' symbol of this annotation in the source code.
+  SourceLocation source_location = 4;
+}
+
+// Location of code relative to a given source file.
+message SourceLocation {
+  // Path to the source file (absolute or relative to the working directory).
+  string file = 1;
+  // Line and column numbers within the source file, 1-based.
+  int32 line = 2;
+  int32 column = 3;
+}
+  
+// For "safe" enums with no underlying representation and no member integer
+// values.
+message P4EnumTypeSpec {
+  message Member {
+    string name = 1;
+    repeated string annotations = 2;
+    // Optional. If present, the location of `annotations[i]` is given by
+   // `annotation_locations[i]`.
+    repeated SourceLocation annotation_locations = 4;
+    repeated StructuredAnnotation structured_annotations = 3;
+  }
+  repeated Member members = 1;
+  repeated string annotations = 2;
+  // Optional. If present, the location of `annotations[i]` is given by
+ // `annotation_locations[i]`.
+  repeated SourceLocation annotation_locations = 4;
+  repeated StructuredAnnotation structured_annotations = 3;
+}
+
+// For serializable (or "unsafe") enums, which have an underlying type. Note
+// that as per the P4_16 specification, the underlying representation can only
+// be a bit<W> type.
+message P4SerializableEnumTypeSpec {
+  message Member {
+    string name = 1;
+    bytes value = 2;
+    repeated string annotations = 3;
+    // Optional. If present, the location of `annotations[i]` is given by
+   // `annotation_locations[i]`.
+    repeated SourceLocation annotation_locations = 5;
+    repeated StructuredAnnotation structured_annotations = 4;
+  }
+  P4BitTypeSpec underlying_type = 1;
+  repeated Member members = 2;
+  repeated string annotations = 3;
+  // Optional. If present, the location of `annotations[i]` is given by
+ // `annotation_locations[i]`.
+  repeated SourceLocation annotation_locations = 5;
+  repeated StructuredAnnotation structured_annotations = 4;
+}
+
+// Similar to an enum, but there is always one and only one instance per P4
+// program.
+message P4ErrorTypeSpec {
+  repeated string members = 1;
+}
+
+message P4NewTypeTranslation {
+  message SdnString {}
+
+  // the URI uniquely identifies the translation in order to enable the
+  // P4Runtime agent to perform value-mapping appropriately when required. It is
+  // recommended that the URI includes at least the P4 architecture name and the
+  // type name.
+  string uri = 1;
+
+  // The object is either represented as an unsigned integer with a bitwidth of
+  // `sdn_bitwidth`, or as a string.
+  oneof sdn_type {
+    int32 sdn_bitwidth = 2;
+    SdnString sdn_string = 3;
+  }
+}
+
+// New types introduced with the "type" keyword
+message P4NewTypeSpec {
+  oneof representation {
+    // if no @p4runtime_translation annotation present
+    P4DataTypeSpec original_type = 1;
+    // if @p4runtime_translation annotation present
+    P4NewTypeTranslation translated_type = 2;
+  }
+  // for other annotations (not @p4runtime_translation)
+  repeated string annotations = 3;
+  // Optional. If present, the location of `annotations[i]` is given by
+ // `annotation_locations[i]`.
+  repeated SourceLocation annotation_locations = 5;
+  repeated StructuredAnnotation structured_annotations = 4;
+}
+
+// End of P4 type specs --------------------------------------------------------
+
+
+
+message P4Info {
+  PkgInfo pkg_info = 1;
+  repeated Table tables = 2;
+  repeated P4InfoAction actions = 3;
+  repeated ActionProfile action_profiles = 4;
+  repeated Counter counters = 5;
+  repeated DirectCounter direct_counters = 6;
+  repeated Meter meters = 7;
+  repeated DirectMeter direct_meters = 8;
+  repeated ControllerPacketMetadata controller_packet_metadata = 9;
+  repeated ValueSet value_sets = 10;
+  repeated Register registers = 11;
+  repeated Digest digests = 12;
+  repeated Extern externs = 100;
+  P4TypeInfo type_info = 200;
+}
+
+message Documentation {
+  // A brief description of something, e.g. one sentence
+  string brief = 1;
+  // A more verbose description of something. Multiline is accepted. Markup
+  // format (if any) is TBD.
+  string description = 2;
+}
+
+// Top-level package documentation describing the forwarding pipeline config
+// Can be used to manage multiple P4 packages.
+message PkgInfo {
+  // a definitive name for this configuration, e.g. switch.p4_v1.0
+  string name = 1;
+  // configuration version, free-format string
+  string version = 2;
+  // brief and detailed descriptions
+  Documentation doc = 3;
+  // Miscellaneous metadata, free-form; a way to extend PkgInfo
+  repeated string annotations = 4;
+  // Optional. If present, the location of `annotations[i]` is given by
+ // `annotation_locations[i]`.
+  repeated SourceLocation annotation_locations = 10;
+  // the target architecture, e.g. "psa"
+  string arch = 5;
+  // organization which produced the configuration, e.g. "p4.org"
+  string organization = 6;
+  // contact info for support,e.g. "tech-support@acme.org"
+  string contact = 7;
+  // url for more information, e.g. "http://support.p4.org/ref/p4/switch.p4_v1.0"
+  string url = 8;
+  // Miscellaneous metadata, structured; a way to extend PkgInfo
+  repeated StructuredAnnotation structured_annotations = 9;
+}
+
+// wrapping the enum in a message to avoid name collisions in C++, where "enum
+// values are siblings of their type, not children of it"
+message P4Ids {
+  // ids are allocated in such a way that it is possible based on an id to
+  // deduce the resource type (e.g. table, action, counter, ...). The
+  // most-significant byte of the 32-bit id encodes the resource type. The
+  // purpose of this enum is to define which value is used as the
+  // most-significant byte for each resource type. The P4 compiler must use
+  // these values when allocating ids for P4 objects. Other users of P4Info can
+  // refer to this enum to identify a resource type based on its id.
+  enum Prefix {
+    UNSPECIFIED = 0;
+
+    // P4 language built-ins
+    ACTION = 0x01;
+    TABLE = 0x02;
+    VALUE_SET = 0x03;
+    CONTROLLER_HEADER = 0x04;
+
+    // PSA externs
+    PSA_EXTERNS_START = 0x10;
+    ACTION_PROFILE = 0x11;
+    COUNTER = 0x12;
+    DIRECT_COUNTER = 0x13;
+    METER = 0x14;
+    DIRECT_METER = 0x15;
+    REGISTER = 0x16;
+    DIGEST = 0x17;
+
+    // externs for other architectures (vendor extensions)
+    OTHER_EXTERNS_START = 0x80;
+
+    // max value for an unsigned 8-bit byte
+    MAX = 0xff;
+    // requires protoc >= 3.5.0
+    // reserved 0x100 to max;
+  }
+}
+
+message Preamble {
+  // ids share the same number-space; e.g. table ids cannot overlap with counter
+  // ids. Even though this is irrelevant to this proto definition, the ids are
+  // allocated in such a way that it is possible based on an id to deduce the
+  // resource type (e.g. table, action, counter, ...). This means that code
+  // using these ids can detect if the wrong resource type is used
+  // somewhere. This also means that ids of different types can be mixed
+  // (e.g. direct resource list for a table) without ambiguity. Note that id 0
+  // is reserved and means "invalid id".
+  uint32 id = 1;
+  // fully qualified name of the P4 object, e.g. c1.c2.ipv4_lpm
+  string name = 2;
+  // an alias (alternative name) for the P4 object, probably shorter than its
+  // fully qualified name. The only constraint is for it to be unique with
+  // respect to other P4 objects of the same type. By default, the compiler uses
+  // the shortest suffix of the name that uniquely identifies the object. For
+  // example if the P4 program contains two tables with names s.c1.t and s.c2.t,
+  // the default aliases will respectively be c1.t and c2.t. In the future, the
+  // P4 programmer may also be able to override the default alias for any P4
+  // object (TBD).
+  string alias = 3;
+  repeated string annotations = 4;
+  // Optional. If present, the location of `annotations[i]` is given by
+ // `annotation_locations[i]`.
+  repeated SourceLocation annotation_locations = 7;
+  // Documentation of the entity
+  Documentation doc = 5;
+  repeated StructuredAnnotation structured_annotations = 6;
+}
+
+// used to group all extern instances of the same type in one message
+message Extern {
+  // the extern_type_id is unique for a given architecture and must be in the
+  // range [0x81, 0xfe].
+  uint32 extern_type_id = 1;
+  string extern_type_name = 2;
+  repeated ExternInstance instances = 3;
+}
+
+message ExternInstance {
+  Preamble preamble = 1;
+  // specific to the extern type, declared in a separate vendor-specific proto
+  // file
+  bytes info = 2;
+}
+
+message MatchField {
+  uint32 id = 1;
+  string name = 2;
+  repeated string annotations = 3;
+  // Optional. If present, the location of `annotations[i]` is given by
+  // `annotation_locations[i]`.
+  repeated SourceLocation annotation_locations = 10;
+  int32 bitwidth = 4;
+  enum MatchType {
+    UNSPECIFIED = 0;
+    EXACT = 2;
+    LPM = 3;
+    TERNARY = 4;
+    RANGE = 5;
+    OPTIONAL = 6;
+  }
+  oneof match {
+    MatchType match_type = 5;
+    // used for architecture-specific match types which are not part of the core
+    // P4 language or of the PSA architecture.
+    string other_match_type = 7;
+  }
+  // Documentation of the match field
+  Documentation doc = 6;
+  // unset if not user-defined type
+  P4NamedType type_name = 8;
+  repeated StructuredAnnotation structured_annotations = 9;
+}
+
+message Table {
+  Preamble preamble = 1;
+  repeated MatchField match_fields = 2;
+  // even when the table is indirect (see implementation_id) below, this field
+  // includes all possible actions for the table; by using ActionRef instead of
+  // a repeated field of action ids, each action reference in a P4 table is able
+  // to have its own annotations
+  repeated ActionRef action_refs = 3;
+  // 0 (default value) means that the table does not have a const default action
+  uint32 const_default_action_id = 4;
+  // P4 id of the "implementation" for this table (e.g. action profile id); 0
+  // (default value) means that the table is a regular (direct) match table. As
+  // of today, only action profiles are supported but other table
+  // implementations may be added in the future
+  uint32 implementation_id = 6;
+  // ids of the direct resources (if any) attached to this table; for now this
+  // includes only direct counters and direct meters, but other resources may be
+  // added in the future
+  repeated uint32 direct_resource_ids = 7;
+  int64 size = 8;  // max number of entries in table
+  // this enum can be extended in the future with other behaviors, such as
+  // "HARD_EVICTION"
+  enum IdleTimeoutBehavior {
+    NO_TIMEOUT = 0;
+    NOTIFY_CONTROL = 1;
+  }
+  // is idle timeout supported for this table?
+  IdleTimeoutBehavior idle_timeout_behavior = 9;
+  // table with static P4 entries, cannot be modified at runtime
+  bool is_const_table = 10;
+  // architecture-specific table properties which are not part of the core P4
+  // language or of the PSA architecture.
+  bytes other_properties = 100;
+}
+
+// used to list all possible actions in a Table
+message ActionRef {
+  uint32 id = 1;
+  enum Scope {
+    TABLE_AND_DEFAULT = 0;
+    TABLE_ONLY = 1;
+    DEFAULT_ONLY = 2;
+  }
+  Scope scope = 3;
+  repeated string annotations = 2;
+  // Optional. If present, the location of `annotations[i]` is given by
+ // `annotation_locations[i]`.
+  repeated SourceLocation annotation_locations = 5;
+  repeated StructuredAnnotation structured_annotations = 4;
+}
+
+message P4InfoAction {
+  Preamble preamble = 1;
+  message Param {
+    uint32 id = 1;
+    string name = 2;
+    repeated string annotations = 3;
+    // Optional. If present, the location of `annotations[i]` is given by
+    // `annotation_locations[i]`.
+    repeated SourceLocation annotation_locations = 8;
+    int32 bitwidth = 4;
+    // Documentation of the Param
+    Documentation doc = 5;
+    // unset if not user-defined type
+    P4NamedType type_name = 6;
+    repeated StructuredAnnotation structured_annotations = 7;
+  }
+  repeated Param params = 2;
+}
+
+message ActionProfile {
+  Preamble preamble = 1;
+  // the ids of the tables sharing this action profile
+  repeated uint32 table_ids = 2;
+  // true iff the action profile used dynamic selection
+  bool with_selector = 3;
+  // max number of weighted member entries in action profile (across all
+  // selector groups, if the action profile has a selector)
+  int64 size = 4;
+  // max number of weighted member entries in any given selector group, or 0 if
+  // the action profile does not have a selector
+  int32 max_group_size = 5;
+}
+
+message CounterSpec {
+  // Corresponds to 'type' constructor parameter for Counter / DirectCounter in
+  // PSA
+  enum Unit {
+    UNSPECIFIED = 0;
+    BYTES = 1;
+    PACKETS = 2;
+    BOTH = 3;
+  }
+  Unit unit = 1;
+}
+
+message Counter {
+  Preamble preamble = 1;
+  CounterSpec spec = 2;
+  // number of entries in the counter array
+  int64 size = 3;
+  // unset if index is not user-defined type
+  P4NamedType index_type_name = 4;
+}
+
+message DirectCounter {
+  Preamble preamble = 1;
+  CounterSpec spec = 2;
+  // the id of the table to which the counter is attached
+  uint32 direct_table_id = 3;
+}
+
+message MeterSpec {
+  // Corresponds to 'type' constructor parameter for Meter / DirectMeter in PSA
+  enum Unit {
+    UNSPECIFIED = 0;
+    BYTES = 1;
+    PACKETS = 2;
+  }
+  Unit unit = 1;
+}
+
+message Meter {
+  Preamble preamble = 1;
+  MeterSpec spec = 2;
+  // number of entries in the meter array
+  int64 size = 3;
+  // unset if index is not user-defined type
+  P4NamedType index_type_name = 4;
+}
+
+message DirectMeter {
+  Preamble preamble = 1;
+  MeterSpec spec = 2;
+  // the id of the table to which the meter is attached
+  uint32 direct_table_id = 3;
+}
+
+// Any metadata associated with controller Packet-IO (Packet-In or Packet-Out)
+// is modeled as P4 headers carrying special annotations
+// @controller_header("packet_out") and @controller_header("packet_in")
+// respectively. There can be at most one header each with these annotations.
+// This message captures the info contained within these special headers,
+// and used in p4runtime.proto to supply the metadata.
+message ControllerPacketMetadata {
+  // preamble.name and preamble.id will specify header type ("packet_out" or
+  // "packet_in" for now).
+  Preamble preamble = 1;
+  message Metadata {
+    uint32 id = 1;
+    // This is the name of the header field (not fully-qualified), similar
+    // to e.g. Action.Param.name.
+    string name = 2;
+    repeated string annotations = 3;
+    // Optional. If present, the location of `annotations[i]` is given by
+    // `annotation_locations[i]`.
+    repeated SourceLocation annotation_locations = 7;
+    int32 bitwidth = 4;
+    // unset if not user-defined type
+    P4NamedType type_name = 5;
+    repeated StructuredAnnotation structured_annotations = 6;
+  }
+  // Ordered based on header layout.
+  // This is a constraint on the generator of this P4Info.
+  repeated Metadata metadata = 2;
+}
+
+message ValueSet {
+  Preamble preamble = 1;
+  repeated MatchField match = 2;
+  // number of entries in the value_set, as per the P4 constructor call.
+  int32 size = 3;
+}
+
+message Register {
+  Preamble preamble = 1;
+  P4DataTypeSpec type_spec = 2;
+  int32 size = 3;
+  // unset if index is not user-defined type
+  P4NamedType index_type_name = 4;
+}
+
+message Digest {
+  Preamble preamble = 1;
+  P4DataTypeSpec type_spec = 2;
+}
+
+
+
+
+/// -----------------------------------------------------------------------------------------------------------
+///                                             p4data.proto
+/// -----------------------------------------------------------------------------------------------------------
+message P4Data {
+  oneof data {
+    bytes bitstring = 1;  // for bit<W>, int<W>
+    P4Varbit varbit = 2;  // for varbit<W>
+    bool bool = 3;
+    P4StructLike tuple = 4;
+    P4StructLike struct = 5;
+    P4Header header = 6;
+    P4HeaderUnion header_union = 7;
+    P4HeaderStack header_stack = 8;
+    P4HeaderUnionStack header_union_stack = 9;
+    string enum = 10;  // safe (non-serializable) enums only
+    string error = 11;
+    bytes enum_value = 12;  // serializable enums only
+  }
+}
+
+message P4Varbit {
+  bytes bitstring = 1;
+  int32 bitwidth = 2;  // dynamic bitwidth of the field
+}
+
+message P4StructLike {
+  repeated P4Data members = 1;
+}
+
+message P4Header {
+  // If the header is invalid (is_valid is "false"), then the bitstrings
+  // repeated field must be empty.
+  bool is_valid = 1;
+  repeated bytes bitstrings = 2;
+}
+
+message P4HeaderUnion {
+  // An empty string indicates that none of the union members are valid and
+  // valid_header must therefore be unset.
+  string valid_header_name = 1;
+  P4Header valid_header = 2;
+}
+
+message P4HeaderStack {
+  // The length of this repeated field must always be equal to the compile-time
+  // size of the header stack, which is specified in P4Info.
+  repeated P4Header entries = 1;
+}
+
+message P4HeaderUnionStack {
+  // The length of this repeated field must always be equal to the compile-time
+  // size of the header union stack, which is specified in P4Info.
+  repeated P4HeaderUnion entries = 1;
+}
+/// -----------------------------------------------------------------------------------------------------------
+
+service P4Runtime {
+  // Update one or more P4 entities on the target.
+  rpc Write(WriteRequest) returns (WriteResponse) {
+  }
+  // Read one or more P4 entities from the target.
+  rpc Read(ReadRequest) returns (stream ReadResponse) {
+  }
+
+  // Sets the P4 forwarding-pipeline config.
+  rpc SetForwardingPipelineConfig(SetForwardingPipelineConfigRequest)
+      returns (SetForwardingPipelineConfigResponse) {
+  }
+  // Gets the current P4 forwarding-pipeline config.
+  rpc GetForwardingPipelineConfig(GetForwardingPipelineConfigRequest)
+      returns (GetForwardingPipelineConfigResponse) {
+  }
+
+  // Represents the bidirectional stream between the controller and the
+  // switch (initiated by the controller), and is managed for the following
+  // purposes:
+  // - connection initiation through client arbitration
+  // - indicating switch session liveness: the session is live when switch
+  //   sends a positive client arbitration update to the controller, and is
+  //   considered dead when either the stream breaks or the switch sends a
+  //   negative update for client arbitration
+  // - the controller sending/receiving packets to/from the switch
+  // - streaming of notifications from the switch
+  rpc StreamChannel(stream StreamMessageRequest)
+      returns (stream StreamMessageResponse) {
+  }
+
+  rpc Capabilities(CapabilitiesRequest) returns (CapabilitiesResponse) {
+  }
+}
+
+//------------------------------------------------------------------------------
+message WriteRequest {
+  uint64 device_id = 1;
+  uint64 role_id = 2 [deprecated=true];
+  string role = 6;
+  Uint128 election_id = 3;
+  // The write batch, comprising a list of Update operations. The P4Runtime
+  // server may arbitrarily reorder messages within a batch to maximize
+  // performance.
+  repeated Update updates = 4;
+  enum Atomicity {
+    // Required. This is the default behavior. The batch is processed in a
+    // non-atomic manner from a data plane point of view. Each operation within
+    // the batch must be attempted even if one or more encounter errors.
+    // Every data plane packet is guaranteed to be processed according to
+    // table contents as they are between two individual operations of the
+    // batch, but there could be several packets processed that see each of
+    // these intermediate stages.
+    CONTINUE_ON_ERROR = 0;
+    // Optional. Operations within the batch are committed to data plane until
+    // an error is encountered. At this point, the operations must be rolled
+    // back such that both software and data plane state is consistent with the
+    // state before the batch was attempted. The resulting behavior is
+    // all-or-none, except the batch is not atomic from a data plane point of
+    // view. Every data plane packet is guaranteed to be processed according to
+    // table contents as they are between two individual operations of the
+    // batch, but there could be several packets processed that see each of
+    // these intermediate stages.
+    ROLLBACK_ON_ERROR = 1;
+    // Optional. Every data plane packet is guaranteed to be processed according
+    // to table contents before the batch began, or after the batch completed
+    // and the operations were programmed to the hardware.
+    // The batch is therefore treated as a transaction. 
+    DATAPLANE_ATOMIC = 2;
+  }
+  Atomicity atomicity = 5;
+}
+
+message WriteResponse {
+}
+
+message ReadRequest {
+  uint64 device_id = 1;
+  // When specified, only return table entries for the given role.
+  string role = 3;
+  repeated Entity entities = 2;
+}
+
+message ReadResponse {
+  repeated Entity entities = 1;
+}
+
+message Update {
+  enum Type {
+    UNSPECIFIED = 0;
+    INSERT = 1;
+    MODIFY = 2;
+    DELETE = 3;
+  }
+  Type type = 1;
+  Entity entity = 2;
+}
+
+message Entity {
+  oneof entity {
+    ExternEntry extern_entry = 1;
+    TableEntry table_entry = 2;
+    ActionProfileMember action_profile_member = 3;
+    ActionProfileGroup action_profile_group = 4;
+    MeterEntry meter_entry = 5;
+    DirectMeterEntry direct_meter_entry = 6;
+    CounterEntry counter_entry = 7;
+    DirectCounterEntry direct_counter_entry = 8;
+    PacketReplicationEngineEntry packet_replication_engine_entry = 9;
+    ValueSetEntry value_set_entry = 10;
+    RegisterEntry register_entry = 11;
+    DigestEntry digest_entry = 12;
+  }
+}
+
+message ExternEntry {
+  // the extern_type_id is unique for a given architecture and must be in the
+  // range [0x81, 0xfe].
+  uint32 extern_type_id = 1;
+  uint32 extern_id = 2;  // id of the instance
+  bytes entry = 3;
+}
+
+message TableEntry {
+  uint32 table_id = 1;
+  repeated FieldMatch match = 2;
+  TableAction action = 3;
+  // Should only be set if the match implies a TCAM lookup, i.e. at least one of
+  // the match fields is Optional, Ternary or Range.  A higher number indicates
+  // higher priority.  Only a highest priority entry that matches the packet
+  // must be selected.  Multiple entries in the same table with the same
+  // priority value are permitted.  See Section "TableEntry" in the
+  // specification for details of the behavior.
+  int32 priority = 4;
+  // Metadata (cookie) opaque to the target. There is no requirement of where
+  // this is stored, as long as it is returned with the rest of the entry in
+  // a Read RPC. This is deprecated in favor of the more flexible metadata
+  // field.
+  uint64 controller_metadata = 5 [deprecated=true];
+  // meter_config and counter_data are convenience fields that enable the
+  // controller to configure the direct resources associated with the table at
+  // the same time as a match-action entry is inserted or modified.
+  // Table write:
+  //   - If the table does not contain a direct resource, then setting the
+  //     corresponding direct resource field in any table write operation will
+  //     return an error.
+  //   - When inserting a new table entry, leaving these fields unset means that
+  //     the direct resources of this table (if any) will assume default values.
+  //     For counters, the default value is 0, and for meters, the default value
+  //     is always green.
+  //   - When updating a table entry, leaving meter_config unset will reset the
+  //     meter (if any) to its default configuration, while leaving counter_data
+  //     unset means that the counter (if any) will not be updated.
+  // Table read:
+  //   - If the table does not contain a direct resource, then the corresponding
+  //     field will not be set in the read table entry.
+  //   - If meter_config is unset in the request, or if the meter has a default
+  //     configuration, meter_config will not be set in the response.
+  //   - If counter_data is unset in the request, it will be unset in the
+  //     response as well.
+  MeterConfig meter_config = 6;
+  CounterData counter_data = 7;
+  // Set to true if the table entry is being used to update the non-const
+  // default action of the table. If true, the "match" field must be empty and
+  // the "action" field must be populated with a valid direct action.
+  bool is_default_action = 8;
+  // The TTL for the entry, in nanoseconds. A value of 0 means that the table
+  // entry never "expires".
+  int64 idle_timeout_ns = 9;
+  message IdleTimeout {
+    // Time elapsed - in nanoseconds - since the table entry was last "hit" as
+    // part of a data plane table lookup.
+    int64 elapsed_ns = 1;
+  }
+  // Table write: this field should be left unset.
+  // Table read: if the table supports idle timeout and time_since_last_hit is
+  // set in the request, this field will be set in the response.
+  IdleTimeout time_since_last_hit = 10;
+  // Arbitrary metadata from the controller that is opaque to the target.
+  bytes metadata = 11;
+}
+
+// field_match_type ::= exact | ternary | lpm | range | optional
+message FieldMatch {
+  uint32 field_id = 1;
+
+  // Matches can be performed on arbitrarily-large inputs; the protobuf type
+  // 'bytes' is used to model arbitrarily-large values.
+  message Exact {
+    bytes value = 1;
+  }
+  message Ternary {
+    bytes value = 1;
+    bytes mask = 2;
+  }
+  message LPM {
+    bytes value = 1;
+    int32 prefix_len = 2;  // in bits
+  }
+  // A Range is logically a set that contains all values numerically between
+  // 'low' and 'high' inclusively.
+  message Range {
+    bytes low = 1;
+    bytes high = 2;
+  }
+  // If the Optional match should be a wildcard, the FieldMatch must be omitted.
+  // Otherwise, this behaves like an exact match.
+  message Optional {
+    bytes value = 1;
+  }
+
+  oneof field_match_type {
+    Exact exact = 2;
+    Ternary ternary = 3;
+    LPM lpm = 4;
+    Range range = 6;
+    Optional optional = 7;
+    // Architecture-specific match value; it corresponds to the other_match_type
+    // in the P4Info MatchField message.
+    bytes other = 100;
+  }
+}
+
+// table_actions ::= action_specification | action_profile_specification
+message TableAction {
+  oneof type {
+    Action action = 1;
+    uint32 action_profile_member_id = 2;
+    uint32 action_profile_group_id = 3;
+    ActionProfileActionSet action_profile_action_set = 4;
+  }
+}
+
+message Action {
+  uint32 action_id = 1;
+  message Param {
+    uint32 param_id = 2;
+    bytes value = 3;
+  }
+  repeated Param params = 4;
+}
+
+message ActionProfileActionSet {
+  repeated ActionProfileAction action_profile_actions = 1;
+}
+
+message ActionProfileAction {
+  Action action = 1;
+  int32 weight = 2;
+  oneof watch_kind {
+    // Using int32 as ports is deprecated, use watch_port instead.
+    int32 watch = 3 [deprecated=true];
+    bytes watch_port = 4;
+  }
+}
+
+//------------------------------------------------------------------------------
+message ActionProfileMember {
+  uint32 action_profile_id = 1;
+  uint32 member_id = 2;
+  Action action = 3;
+}
+
+//------------------------------------------------------------------------------
+message ActionProfileGroup {
+  uint32 action_profile_id = 1;
+  uint32 group_id = 2;
+  message Member {
+    uint32 member_id = 1;
+    int32 weight = 2;
+    oneof watch_kind {
+      // Using int32 as ports is deprecated, use watch_port instead.
+      int32 watch = 3 [deprecated=true];
+      bytes watch_port = 4;
+    }
+  }
+  repeated Member members = 3;
+  // Max number of weighted member entries in this group. It cannot be modified
+  // after a group has been created. It must not exceed the static
+  // max_group_size included in P4Info. If the max size is not known at group
+  // creation-time, the client may leave this field unset (default value 0), in
+  // which case the static max_group_size value will be used and the group will
+  // be able to include up to max_group_size weighted member entries.
+  int32 max_size = 4;
+}
+
+// An index as a protobuf message. In proto3, fields cannot be optional and
+// there is no difference between an unset integer field and an integer field
+// set to 0. This is inconvenient for reading from P4 array-like structures,
+// such as indirect counters and meters. We need a way to do a wildcard read on
+// these but we cannot use a default zero index value to do so, as zero is a
+// valid index (first entry in the array). We therefore wrap the index in a
+// message.
+message Index {
+  int64 index = 1;
+}
+
+//------------------------------------------------------------------------------
+// For WriteRequest, Update.Type must be MODIFY.
+// For ReadRequest, the scope is defined as follows:
+// - All meter cells for all meters if meter_id = 0 (default).
+// - All meter cells for given meter_id if index is unset (default).
+message MeterEntry {
+  uint32 meter_id = 1;
+  Index index = 2;
+  MeterConfig config = 3;
+}
+
+//------------------------------------------------------------------------------
+// For WriteRequest, Update.Type must be MODIFY. INSERT and DELETE on direct
+// meters is not allowed and will return an error. The insertion/deletion
+// should happen as part of INSERT/DELETE on the associated table-entry.
+// For ReadRequest, the scope is defined as follows:
+// - All meter cells for all tables if table_entry.table_id = 0.
+// - All meter cells of a table if table_entry.table_id is present and
+//   table_entry.match is empty.
+message DirectMeterEntry {
+  // The associated table entry. This field is required.
+  // table_entry.action is ignored. Other fields specify the match.
+  TableEntry table_entry = 1;
+  MeterConfig config = 2;
+}
+
+// Modeled as RFC 2698: A Two Rate Three Color Marker (trTCM)
+// The trTCM meters a packet stream and marks its packets based on two rates,
+// Peak Information Rate (PIR) and Committed Information Rate (CIR), and their
+// associated burst sizes to be either green, yellow, or red.  A packet is
+// marked red if it exceeds the PIR.  Otherwise it is marked either yellow or
+// green depending on whether it exceeds or doesn't exceed the CIR.
+message MeterConfig {
+  // Committed information rate (units per sec)
+  int64 cir = 1;
+  // Committed burst size
+  int64 cburst = 2;
+  // Peak information rate (units per sec)
+  int64 pir = 3;
+  // Peak burst size
+  int64 pburst = 4;
+}
+
+//------------------------------------------------------------------------------
+// For WriteRequest, Update.Type must be MODIFY.
+// For ReadRequest, the scope is defined as follows:
+// - All counter cells for all counters if counter_id = 0 (default).
+// - All counter cells for given counter_id if index is unset (default).
+message CounterEntry {
+  uint32 counter_id = 1;
+  Index index = 2;
+  CounterData data = 3;
+}
+
+//------------------------------------------------------------------------------
+// For WriteRequest, Update.Type must be MODIFY. INSERT and DELETE on direct
+// counters is not allowed and will return an error. The insertion/deletion
+// should happen as part of INSERT/DELETE on the associated table-entry.
+// For ReadRequest, the scope is defined as follows:
+// - All counter cells for all tables if table_entry.table_id = 0.
+// - All counter cells of a table if table_entry.table_id is present and
+//   table_entry.match is empty.
+message DirectCounterEntry {
+  // The associated table entry. This field is required.
+  // table_entry.action is ignored. Other fields specify the match.
+  TableEntry table_entry = 1;
+  CounterData data = 2;
+}
+
+message CounterData {
+  int64 byte_count = 1;
+  int64 packet_count = 2;
+}
+
+//------------------------------------------------------------------------------
+// Only one instance of a Packet Replication Engine (PRE) is expected in the
+// P4 pipeline. Hence, no instance id is needed to access the PRE.
+message PacketReplicationEngineEntry {
+  oneof type {
+    MulticastGroupEntry multicast_group_entry = 1;
+    CloneSessionEntry clone_session_entry = 2;
+  }
+}
+
+// Used for replicas created for cloning and multicasting actions.
+message Replica {
+  uint32 egress_port = 1;
+  uint32 instance = 2;
+}
+
+// The (egress_port, instance) pair must be unique for each replica in a given
+// multicast group entry. A packet may be multicast by setting the
+// multicast_group field of PSA ingress output metadata to multicast_group_id
+// of a programmed multicast group entry. The egress_port and instance fields of
+// each replica's egress input metadata will be set to the respective values
+// programmed in the multicast group entry.
+message MulticastGroupEntry {
+  uint32 multicast_group_id = 1;
+  repeated Replica replicas = 2;
+}
+
+// A packet may be cloned by setting the clone_session_id field of PSA
+// ingress/egress output metadata to session_id of a programmed clone session
+// entry. Multiple clones may be created via a single clone session entry by
+// using the replicas message. The clones may be distinguished in the egress
+// using the instance field. The class_of_service field of the clone's egress
+// input metadata will be set to the respective value programmed in the clone
+// session entry. Note that in case of multiple clones, all clones, defined
+// for a clone session, will get the same class of service. The
+// packet_length_bytes field must be set to a non-zero value if the clone
+// packet(s) should be truncated to the given value (in bytes). The packet
+// length is also common to all clones in the clone session. If the
+// packet_length_bytes field is 0, no truncation on the clone(s) will be
+// performed.
+message CloneSessionEntry {
+  uint32 session_id = 1;
+  repeated Replica replicas = 2;
+  uint32 class_of_service = 3;
+  int32 packet_length_bytes = 4;
+}
+
+// A member in a P4 value set. Each member defines a list of matches, which can
+// have different match types.
+message ValueSetMember {
+  repeated FieldMatch match = 1;
+}
+
+//------------------------------------------------------------------------------
+// For writing and reading matches in a parser value set. A state transition
+// on an empty value set will never be taken. The number of matches must be at
+// most the size of the value set as specified by the size argument of the
+// value_set constructor in the P4 program.
+//
+// For Write Requests:
+//   - MODIFY will write the given matches in the repeated field to the value
+//     set.
+//   - INSERT and DELETE are not allowed.
+//
+// For Read Requests:
+//   - All matches for all value-set entries if value_set_id = 0
+//   - All matches of the value-set if a valid value_set_id is specified
+//   - The 'match' field must never be set in the ReadRequest
+message ValueSetEntry {
+  uint32 value_set_id = 1;
+  repeated ValueSetMember members = 2;
+}
+
+//------------------------------------------------------------------------------
+message RegisterEntry {
+  uint32 register_id = 1;
+  Index index = 2;
+  P4Data data = 3;
+}
+
+//------------------------------------------------------------------------------
+// Used to configure the digest extern only, not to stream digests or acks
+message DigestEntry {
+  uint32 digest_id = 1;
+  // a DigestList message is streamed when the following conditions are met:
+  //   - there is at least one digest ready
+  //   - the oldest digest in the list has been waiting for at least
+  //     max_timeout_ns nanoseconds or we have gathered max_list_size digests
+  //     already
+  message Config {
+    int64 max_timeout_ns = 1;  // max timeout for outstanding digest data
+    int32 max_list_size = 2;  // max size for a digest list
+    int64 ack_timeout_ns = 3;  // timeout for DigestListAck message
+  }
+  Config config = 2;
+}
+
+//------------------------------------------------------------------------------
+message StreamMessageRequest {
+  oneof update {
+    MasterArbitrationUpdate arbitration = 1;
+    PacketOut packet = 2;
+    DigestListAck digest_ack = 3;
+    bytes other = 4;
+  }
+}
+
+// Packet sent from the controller to the switch.
+message PacketOut {
+  bytes payload = 1;
+  // This will be based on P4 header annotated as
+  // @controller_header("packet_out").
+  // At most one P4 header can have this annotation.
+  repeated PacketMetadata metadata = 2;
+}
+
+// Used by the controller to ack a DigestList message. To avoid flooding the
+// controller, the switch must not generate digest notifications for the same
+// data until a DigestListAck message with the same list_id is received or the
+// ack timeout (ack_timeout_ns field in DigestEntry.Config) expires.
+message DigestListAck {
+  uint32 digest_id = 1;
+  uint64 list_id = 2;
+}
+
+message StreamMessageResponse {
+  oneof update {
+    MasterArbitrationUpdate arbitration = 1;
+    PacketIn packet = 2;
+    DigestList digest = 3;
+    IdleTimeoutNotification idle_timeout_notification = 4;
+    bytes other = 5;
+    // Used by the server to asynchronously report errors which occur when
+    // processing StreamMessageRequest messages.
+    StreamError error = 6;
+  }
+}
+
+// Packet sent from the switch to the controller.
+message PacketIn {
+  bytes payload = 1;
+  // This will be based on P4 header annotated as
+  // @controller_header("packet_in").
+  // At most one P4 header can have this annotation.
+  repeated PacketMetadata metadata = 2;
+}
+
+message DigestList {
+  uint32 digest_id = 1;  // identifies the digest extern instance
+  uint64 list_id = 2;  // identifies a list of entries, used by receiver to ack
+  // List of entries: each call to the Digest<T>::pack() method corresponds to
+  // one entry and we can have as little as one entry.
+  repeated P4Data data = 3;
+  // Timestamp at which the server generated the message (in nanoseconds since
+  // Epoch)
+  int64 timestamp = 4;
+}
+
+// Any metadata associated with Packet-IO (controller Packet-In or Packet-Out)
+// needs to be modeled as P4 headers carrying special annotations
+// @controller_header("packet_out") and @controller_header("packet_in")
+// respectively. There can be at most one header each with these annotations.
+// These special headers are captured in P4Info ControllerPacketMetadata.
+message PacketMetadata {
+  // This refers to Metadata.id coming from P4Info ControllerPacketMetadata.
+  uint32 metadata_id = 1;
+  bytes value = 2;
+}
+
+// The `Status` type defines a logical error model that is suitable for
+// different programming environments, including REST APIs and RPC APIs. It is
+// used by [gRPC](https://github.com/grpc). Each `Status` message contains
+// three pieces of data: error code, error message, and error details.
+//
+// You can find out more about this error model and how to work with it in the
+// [API Design Guide](https://cloud.google.com/apis/design/errors).
+message Status {
+  // The status code, which should be an enum value of [google.rpc.Code][google.rpc.Code].
+  int32 code = 1;
+
+  // A developer-facing error message, which should be in English. Any
+  // user-facing error message should be localized and sent in the
+  // [google.rpc.Status.details][google.rpc.Status.details] field, or localized by the client.
+  string message = 2;
+
+  // A list of messages that carry the error details.  There is a common set of
+  // message types for APIs to use.
+  repeated bytes details = 3;
+}
+
+message MasterArbitrationUpdate {
+  uint64 device_id = 1;
+  // The role for which the primary client is being arbitrated. For use-cases
+  // where multiple roles are not needed, the controller can leave this unset,
+  // implying default role and full pipeline access.
+  Role role = 2;
+  // The stream RPC with the highest election_id is the primary. The 'primary'
+  // controller instance populates this with its latest election_id. Switch
+  // populates with the highest election ID it has received from all connected
+  // controllers.
+  Uint128 election_id = 3;
+  // Switch populates this with OK for the client that is the primary, and
+  // with an error status for all other connected clients (at every primary
+  // client change). The controller does not populate this field.
+  Status status = 4;
+}
+
+message Role {
+  // Uniquely identifies this role.
+  uint64 id = 1 [deprecated=true];
+  string name = 3;
+  // Describes the role configuration, i.e. what operations, P4 entities,
+  // behaviors, etc. are in the scope of a given role. If config is not set
+  // (default case), it implies all P4 objects and control behaviors are in
+  // scope, i.e. full pipeline access. The format of this message is
+  // out-of-scope of P4Runtime.
+  bytes config = 2;
+}
+
+message IdleTimeoutNotification {
+  // The only fields that are required to be set in each TableEntry are the
+  // "key" fields (table_id, match and priority) along with controller_metadata,
+  // metadata and idle_timeout_ns.
+  repeated TableEntry table_entry = 1;
+  // Timestamp at which the server generated the message (in nanoseconds since
+  // Epoch)
+  int64 timestamp = 2;
+}
+
+// Used by the server to asynchronously report errors which occur when
+// processing StreamMessageRequest messages.
+message StreamError {
+  // gRPC canonical error code (see
+  // https://developers.google.com/maps-booking/reference/grpc-api/status_codes)
+  int32 canonical_code = 1;
+  // Optional. An explanation of the error.
+  string message = 2;
+  // Optional. Target and architecture specific space to which this error
+  // belongs.
+  // We encourage using triplet: <target>-<arch>-<vendor>,
+  // e.g."targetX-psa-vendor1" or "targetY-psa-vendor2".
+  string space = 3;
+  // Optional. Numeric code drawn from target-specific error space above.
+  int32 code = 4;
+  // Used by the server to convey additional information about the error. One of
+  // the fields must be set (so that the client can identify which type of
+  // stream message triggered the error), but that field may be set to its
+  // default value.
+  oneof details {
+    PacketOutError packet_out = 5;
+    DigestListAckError digest_list_ack = 6;
+    StreamOtherError other = 7;
+  }
+}
+
+message PacketOutError {
+  // Optional. The packet out message that caused the error.
+  PacketOut packet_out = 1;
+}
+
+message DigestListAckError {
+  // Optional. The digest list acknowledgement message that caused the error.
+  DigestListAck digest_list_ack = 1;
+}
+
+message StreamOtherError {
+  // Optional. The architecture-specific stream message that caused the error.
+  bytes other = 1;
+}
+
+message Uint128 {
+  // Highest 64 bits of a 128 bit number.
+  uint64 high = 1;
+  // Lowest 64 bits of a 128 bit number.
+  uint64 low = 2;
+}
+
+//------------------------------------------------------------------------------
+message SetForwardingPipelineConfigRequest {
+  enum Action {
+    UNSPECIFIED = 0;
+    // Verify that the target can realize the given config. Do not modify the
+    // forwarding state in the target. Returns error if config is not provided
+    // of if the provided config cannot be realized.
+    VERIFY = 1;
+    // Save the config if the target can realize it. Do not modify the
+    // forwarding state in the target. Any subsequent read/write requests must
+    // refer to fields in the new config. Returns error if config is not
+    // provided of if the provided config cannot be realized.
+    VERIFY_AND_SAVE = 2;
+    // Verify, save and realize the given config. Clear the forwarding state
+    // in the target. Returns error if config is not provided of if the
+    // provided config cannot be realized.
+    VERIFY_AND_COMMIT = 3;
+    // Realize the last saved, but not yet committed, config. Update the
+    // forwarding state in the target by replaying the write requests since the
+    // last config was saved. Config should not be provided for this action
+    // type. Returns an error if no saved config is found or if a config is
+    // provided with this message.
+    COMMIT = 4;
+    // Verify, save and realize the given config, while preserving the
+    // forwarding state in the target. This is an advanced use case to enable
+    // changes to the P4 forwarding pipeline configuration with minimal traffic
+    // loss. P4Runtime does not impose any constraints on the duration of the
+    // traffic loss. The support for this option is not expected to be uniform
+    // across all P4Runtime targets. A target that does not support this option
+    // may return an UNIMPLEMENTED error. For targets that support this option,
+    // an INVALID_ARGUMENT error is returned if no config is provided, or if
+    // the existing forwarding state cannot be preserved for the given config
+    // by the target.
+    RECONCILE_AND_COMMIT = 5;
+  }
+  uint64 device_id = 1;
+  uint64 role_id = 2 [deprecated=true];
+  string role = 6;
+  Uint128 election_id = 3;
+  Action action = 4;
+  ForwardingPipelineConfig config = 5;
+}
+
+message SetForwardingPipelineConfigResponse {
+}
+
+message ForwardingPipelineConfig {
+  P4Info p4info = 1;
+  // Target-specific P4 configuration.
+  bytes p4_device_config = 2;
+  // Metadata (cookie) opaque to the target. A control plane may use this field
+  // to uniquely identify this config. There are no restrictions on how such
+  // value is computed, or where this is stored on the target, as long as it is
+  // returned with a GetForwardingPipelineConfig RPC. When reading the cookie,
+  // we need to distinguish those cases where a cookie is NOT present (e.g. not
+  // set in the SetForwardingPipelineConfigRequest, therefore we wrap the actual
+  // uint64 value in a protobuf message.
+  message Cookie {
+    uint64 cookie = 1;
+  }
+  Cookie cookie = 3;
+}
+
+message GetForwardingPipelineConfigRequest {
+  // Specifies the fields to populate in the response.
+  enum ResponseType {
+    // Default behaviour. Returns a ForwardingPipelineConfig with all fields set
+    // as stored by the target.
+    ALL = 0;
+    // Reply by setting only the cookie field, omitting all other fields.
+    COOKIE_ONLY = 1;
+    // Reply by setting the p4info and cookie fields.
+    P4INFO_AND_COOKIE = 2;
+    // Reply by setting the p4_device_config and cookie fields.
+    DEVICE_CONFIG_AND_COOKIE = 3;
+  }
+  uint64 device_id = 1;
+  ResponseType response_type = 2;
+}
+
+message GetForwardingPipelineConfigResponse {
+  ForwardingPipelineConfig config = 1;
+}
+
+// Error message used to report a single P4-entity error for a Write RPC.
+message Error {
+  // gRPC canonical error code (see
+  // https://developers.google.com/maps-booking/reference/grpc-api/status_codes)
+  int32 canonical_code = 1;
+  // Detailed error message.
+  string message = 2;
+  // Target and architecture specific space to which this error belongs.
+  // We encourage using triplet: <target>-<arch>-<vendor>,
+  // e.g."targetX-psa-vendor1" or "targetY-psa-vendor2".
+  string space = 3;
+  // Numeric code drawn from target-specific error space above.
+  int32 code = 4;
+  // Optional: Allows reporting back additional target-specific details on the
+  // error.
+  bytes details = 5;
+}
+
+//------------------------------------------------------------------------------
+// Reserved controller-specified SDN port numbers for reference.
+enum SdnPort {
+  SDN_PORT_UNKNOWN = 0;
+  // SDN ports are numbered starting form 1.
+  SDN_PORT_MIN = 1;
+  // 0xfffffeff: The maximum value of an SDN port (physical or logical).
+  SDN_PORT_MAX = -257;
+  // Reserved SDN port numbers (0xffffff00 - 0xffffffff)
+  // 0xfffffffa: Recirculate the packet back to ingress
+  SDN_PORT_RECIRCULATE = -6;
+  // 0xfffffffd: Send to CPU
+  SDN_PORT_CPU = -3;
+}
+
+//------------------------------------------------------------------------------
+message CapabilitiesRequest {
+}
+
+message CapabilitiesResponse {
+  // The full semantic version string (e.g. "1.1.0-rc.1") corresponding to the
+  // version of the P4Runtime API currently implemented by the server.
+  string p4runtime_api_version = 1;
+}

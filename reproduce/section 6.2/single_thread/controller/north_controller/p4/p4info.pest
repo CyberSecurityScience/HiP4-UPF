@@ -1,0 +1,38 @@
+ident = @{ ASCII_ALPHA ~ (ASCII_ALPHANUMERIC | "_")* }
+int = { ("+" | "-")? ~ ASCII_DIGIT+ }
+
+string = ${ "\"" ~ inner ~ "\"" }
+inner = @{ char* }
+char = {
+    !("\"" | "\\") ~ ANY
+    | "\\" ~ ("\"" | "\\" | "/" | "b" | "f" | "n" | "r" | "t")
+    | "\\" ~ ("u" ~ ASCII_HEX_DIGIT{4})
+}
+
+int_inner = { int }
+ident_inner = { ident }
+
+field = {
+    ident
+    ~ ":"
+    ~ (int_inner | string | ident_inner)
+}
+
+field_list = {
+    (field | entity)*
+}
+
+entity = {
+    ident
+    ~ "{"
+    ~ field_list
+    ~ "}"
+}
+
+root = {
+    SOI
+    ~ (entity)*
+    ~ EOI
+}
+
+WHITESPACE = _{ " " | "\t" | "\n" | "\r" }

@@ -1,0 +1,16 @@
+n3:
+  - if:
+      name: dummy1
+      cidr: '10.0.0.1/24'
+n6: []
+n9:
+  - if:
+      name: 'dummy2'
+      cidr: '10.0.1.1/24'
+      mtu: 65536
+predefined_rules:
+  - name: test
+    pdr:
+      a: a
+    far:
+      a: a

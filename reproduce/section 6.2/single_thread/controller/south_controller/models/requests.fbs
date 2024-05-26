@@ -1,0 +1,80 @@
+
+namespace UPFDriver.Requests;
+
+table DL_N6_SimpleInsertRequest {
+    key_ipv4    : uint32;
+    data_ma_id  : uint32;
+    data_teid   : uint32;
+    data_qer_id : uint16;
+
+    vol_thres   : uint64;
+}
+
+table DL_N6_SimpleUpdateRequest {
+    key_ipv4       : uint32;
+    data_ma_id     : uint32;
+    data_old_ma_id : uint32;
+    data_teid      : uint32;
+    data_qer_id    : uint16;
+
+    vol_thres   : uint64;
+}
+
+table DL_N6_SimpleRemoveRequest {
+    key_ipv4       : uint32;
+    data_old_ma_id : uint32;
+}
+
+table UL_N6_SimpleInsertRequest {
+    key_teid    : uint32;
+    key_qfi     : uint8;
+    data_ma_id  : uint32;
+    data_qer_id : uint16;
+
+    vol_thres   : uint64;
+}
+
+table UL_N6_SimpleUpdateRequest {
+    key_teid       : uint32;
+    key_qfi        : uint8;
+    data_ma_id     : uint32;
+    data_old_ma_id : uint32;
+    data_qer_id    : uint16;
+
+    vol_thres   : uint64;
+}
+
+table UL_N6_SimpleRemoveRequest {
+    key_teid       : uint32;
+    key_qfi        : uint8;
+    data_old_ma_id : uint32;
+}
+
+
+table SetMaidVolThreshold {
+    ma_id : uint32;
+    bytes : uint64;
+}
+
+
+union RequestUnion {
+    DL_N6_SimpleInsertRequest,
+    DL_N6_SimpleUpdateRequest,
+    DL_N6_SimpleRemoveRequest,
+    UL_N6_SimpleInsertRequest,
+    UL_N6_SimpleUpdateRequest,
+    UL_N6_SimpleRemoveRequest,
+    SetMaidVolThreshold,
+}
+
+table Request {
+    request: RequestUnion;
+}
+
+table Transaction {
+    transaction_id : uint32;
+    deadline       : uint64;
+    ops            : [Request];
+}
+
+root_type Transaction;

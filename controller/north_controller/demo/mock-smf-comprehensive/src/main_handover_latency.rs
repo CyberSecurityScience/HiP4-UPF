@@ -761,82 +761,6 @@ async fn main() {
 			.truncate(true)
 			.create(true)
 			.write(true)
-			.open(format!("{}-ho-latency-sub1-{}.csv", upf_name, round_time_ms))
-			.unwrap();
-		let mut all_ho_latencies = all_ho_latencies_1.write().await;
-		all_ho_latencies.sort_by(|a, b| a.partial_cmp(b).unwrap());
-		let (avg, stddev) = mean_stddev(&all_ho_latencies.iter().map(|f| *f as f64).collect::<Vec<_>>());
-		file_csv.write(format!("avg,{}\n", avg).as_bytes()).unwrap();
-		file_csv.write(format!("stddev,{}\n", stddev).as_bytes()).unwrap();
-		for p in 0..101 {
-			let p2 = p as f64 / 100.0f64;
-			let idx = (p2 * (all_ho_latencies.len() - 1) as f64) as usize;
-			let val = all_ho_latencies[idx];
-			file_csv.write(format!("{},{}\n", p2, val).as_bytes()).unwrap();
-		}
-	}
-	{
-		let mut file_csv = OpenOptions::new()
-			.truncate(true)
-			.create(true)
-			.write(true)
-			.open(format!("{}-ho-latency-sub2-{}.csv", upf_name, round_time_ms))
-			.unwrap();
-		let mut all_ho_latencies = all_ho_latencies_2.write().await;
-		all_ho_latencies.sort_by(|a, b| a.partial_cmp(b).unwrap());
-		let (avg, stddev) = mean_stddev(&all_ho_latencies.iter().map(|f| *f as f64).collect::<Vec<_>>());
-		file_csv.write(format!("avg,{}\n", avg).as_bytes()).unwrap();
-		file_csv.write(format!("stddev,{}\n", stddev).as_bytes()).unwrap();
-		for p in 0..101 {
-			let p2 = p as f64 / 100.0f64;
-			let idx = (p2 * (all_ho_latencies.len() - 1) as f64) as usize;
-			let val = all_ho_latencies[idx];
-			file_csv.write(format!("{},{}\n", p2, val).as_bytes()).unwrap();
-		}
-	}
-	{
-		let mut file_csv = OpenOptions::new()
-			.truncate(true)
-			.create(true)
-			.write(true)
-			.open(format!("{}-ho-latency-sub3-{}.csv", upf_name, round_time_ms))
-			.unwrap();
-		let mut all_ho_latencies = all_ho_latencies_3.write().await;
-		all_ho_latencies.sort_by(|a, b| a.partial_cmp(b).unwrap());
-		let (avg, stddev) = mean_stddev(&all_ho_latencies.iter().map(|f| *f as f64).collect::<Vec<_>>());
-		file_csv.write(format!("avg,{}\n", avg).as_bytes()).unwrap();
-		file_csv.write(format!("stddev,{}\n", stddev).as_bytes()).unwrap();
-		for p in 0..101 {
-			let p2 = p as f64 / 100.0f64;
-			let idx = (p2 * (all_ho_latencies.len() - 1) as f64) as usize;
-			let val = all_ho_latencies[idx];
-			file_csv.write(format!("{},{}\n", p2, val).as_bytes()).unwrap();
-		}
-	}
-	{
-		let mut file_csv = OpenOptions::new()
-			.truncate(true)
-			.create(true)
-			.write(true)
-			.open(format!("{}-ho-latency-sub4-{}.csv", upf_name, round_time_ms))
-			.unwrap();
-		let mut all_ho_latencies = all_ho_latencies_4.write().await;
-		all_ho_latencies.sort_by(|a, b| a.partial_cmp(b).unwrap());
-		let (avg, stddev) = mean_stddev(&all_ho_latencies.iter().map(|f| *f as f64).collect::<Vec<_>>());
-		file_csv.write(format!("avg,{}\n", avg).as_bytes()).unwrap();
-		file_csv.write(format!("stddev,{}\n", stddev).as_bytes()).unwrap();
-		for p in 0..101 {
-			let p2 = p as f64 / 100.0f64;
-			let idx = (p2 * (all_ho_latencies.len() - 1) as f64) as usize;
-			let val = all_ho_latencies[idx];
-			file_csv.write(format!("{},{}\n", p2, val).as_bytes()).unwrap();
-		}
-	}
-	{
-		let mut file_csv = OpenOptions::new()
-			.truncate(true)
-			.create(true)
-			.write(true)
 			.open(format!("{}-ho-latency-{}.csv", upf_name, round_time_ms))
 			.unwrap();
 		let mut all_ho_latencies = all_ho_latencies_t.write().await;
@@ -848,24 +772,6 @@ async fn main() {
 			let p2 = p as f64 / 100.0f64;
 			let idx = (p2 * (all_ho_latencies.len() - 1) as f64) as usize;
 			let val = all_ho_latencies[idx];
-			file_csv.write(format!("{},{}\n", p2, val).as_bytes()).unwrap();
-		}
-	}	
-	if false {
-		let mut file_csv = OpenOptions::new()
-			.truncate(true)
-			.create(true)
-			.write(true)
-			.open(format!("{}-ho-throughput-{}.csv", upf_name, round_time_ms))
-			.unwrap();
-		all_ho_throughputs.sort_by(|a, b| a.partial_cmp(b).unwrap());
-		let (avg, stddev) = mean_stddev(&all_ho_throughputs.iter().map(|f| *f as f64).collect::<Vec<_>>());
-		file_csv.write(format!("avg,{}\n", avg).as_bytes()).unwrap();
-		file_csv.write(format!("stddev,{}\n", stddev).as_bytes()).unwrap();
-		for p in 0..101 {
-			let p2 = p as f64 / 100.0f64;
-			let idx = (p2 * (all_ho_throughputs.len() - 1) as f64) as usize;
-			let val = all_ho_throughputs[idx];
 			file_csv.write(format!("{},{}\n", p2, val).as_bytes()).unwrap();
 		}
 	}

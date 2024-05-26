@@ -1,0 +1,35 @@
+
+namespace UPFDriver.Response;
+
+table CounterValue {
+    ma_id : uint32;
+    bytes : uint64;
+    pkts  : uint64;
+}
+
+table CounterValues {
+    values : [CounterValue];
+    is_ig  : bool;
+    ts     : uint64;
+}
+
+table TableOperationComplete {
+    code            : int32; // 0=succeed, 1,2,...=failed
+    transaction_ids : [uint32];
+}
+
+table MA_ID_Reclaimed {
+    ma_ids : [uint32];
+}
+
+union ResponseUnion {
+    CounterValues,
+    TableOperationComplete,
+    MA_ID_Reclaimed
+}
+
+table Response {
+    response : ResponseUnion;
+}
+
+root_type Response;

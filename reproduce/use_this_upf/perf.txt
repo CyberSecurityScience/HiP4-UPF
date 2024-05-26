@@ -1,0 +1,23 @@
+
+monolithic egrees table:
+130k read 1260 ms delay
+
+split into 2 tables :
+65k each read 840ms delay
+
+split into 4 tables :
+65k each read 680ms delay
+
+
+pulling 2 168k entry tables
+min 580 max 2200 mean 600
+
+pulling 4 84k entry tables
+min 345 max 2300 mean 600
+
+pulling 6 84k entry tables
+min 483 max 1782 mean 720
+
+pulling 8 84k entry tables
+failed, too many sessions
+

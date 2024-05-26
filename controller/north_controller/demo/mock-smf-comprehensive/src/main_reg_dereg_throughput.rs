@@ -780,101 +780,6 @@ async fn main() {
 			.truncate(true)
 			.create(true)
 			.write(true)
-			.open(format!("{upfname}-reg-latency-{}.csv", round_time_ms))
-			.unwrap();
-		let mut all_reg_latencies = all_reg_latencies.write().await;
-		all_reg_latencies.sort_by(|a, b| a.partial_cmp(b).unwrap());
-		let (avg, stddev) = mean_stddev(&all_reg_latencies.iter().map(|f| *f as f64).collect::<Vec<_>>());
-		file_csv.write(format!("avg,{}\n", avg).as_bytes()).unwrap();
-		file_csv.write(format!("stddev,{}\n", stddev).as_bytes()).unwrap();
-		for p in 0..101 {
-			let p2 = p as f64 / 100.0f64;
-			let idx = (p2 * (all_reg_latencies.len() - 1) as f64) as usize;
-			let val = all_reg_latencies[idx];
-			file_csv.write(format!("{},{}\n", p2, val).as_bytes()).unwrap();
-		}
-	}
-	{
-		let mut file_csv = OpenOptions::new()
-			.truncate(true)
-			.create(true)
-			.write(true)
-			.open(format!("{upfname}-reg-latency-sub1-{}.csv", round_time_ms))
-			.unwrap();
-		let mut all_reg_latencies = all_reg_latencies1.write().await;
-		all_reg_latencies.sort_by(|a, b| a.partial_cmp(b).unwrap());
-		let (avg, stddev) = mean_stddev(&all_reg_latencies.iter().map(|f| *f as f64).collect::<Vec<_>>());
-		file_csv.write(format!("avg,{}\n", avg).as_bytes()).unwrap();
-		file_csv.write(format!("stddev,{}\n", stddev).as_bytes()).unwrap();
-		for p in 0..101 {
-			let p2 = p as f64 / 100.0f64;
-			let idx = (p2 * (all_reg_latencies.len() - 1) as f64) as usize;
-			let val = all_reg_latencies[idx];
-			file_csv.write(format!("{},{}\n", p2, val).as_bytes()).unwrap();
-		}
-	}
-	{
-		let mut file_csv = OpenOptions::new()
-			.truncate(true)
-			.create(true)
-			.write(true)
-			.open(format!("{upfname}-reg-latency-sub2-{}.csv", round_time_ms))
-			.unwrap();
-		let mut all_reg_latencies = all_reg_latencies2.write().await;
-		all_reg_latencies.sort_by(|a, b| a.partial_cmp(b).unwrap());
-		let (avg, stddev) = mean_stddev(&all_reg_latencies.iter().map(|f| *f as f64).collect::<Vec<_>>());
-		file_csv.write(format!("avg,{}\n", avg).as_bytes()).unwrap();
-		file_csv.write(format!("stddev,{}\n", stddev).as_bytes()).unwrap();
-		for p in 0..101 {
-			let p2 = p as f64 / 100.0f64;
-			let idx = (p2 * (all_reg_latencies.len() - 1) as f64) as usize;
-			let val = all_reg_latencies[idx];
-			file_csv.write(format!("{},{}\n", p2, val).as_bytes()).unwrap();
-		}
-	}
-	{
-		let mut file_csv = OpenOptions::new()
-			.truncate(true)
-			.create(true)
-			.write(true)
-			.open(format!("{upfname}-reg-latency-sub3-{}.csv", round_time_ms))
-			.unwrap();
-		let mut all_reg_latencies = all_reg_latencies3.write().await;
-		all_reg_latencies.sort_by(|a, b| a.partial_cmp(b).unwrap());
-		let (avg, stddev) = mean_stddev(&all_reg_latencies.iter().map(|f| *f as f64).collect::<Vec<_>>());
-		file_csv.write(format!("avg,{}\n", avg).as_bytes()).unwrap();
-		file_csv.write(format!("stddev,{}\n", stddev).as_bytes()).unwrap();
-		for p in 0..101 {
-			let p2 = p as f64 / 100.0f64;
-			let idx = (p2 * (all_reg_latencies.len() - 1) as f64) as usize;
-			let val = all_reg_latencies[idx];
-			file_csv.write(format!("{},{}\n", p2, val).as_bytes()).unwrap();
-		}
-	}
-	{
-		let mut file_csv = OpenOptions::new()
-			.truncate(true)
-			.create(true)
-			.write(true)
-			.open(format!("{upfname}-reg-latency-sub4-{}.csv", round_time_ms))
-			.unwrap();
-		let mut all_reg_latencies = all_reg_latencies4.write().await;
-		all_reg_latencies.sort_by(|a, b| a.partial_cmp(b).unwrap());
-		let (avg, stddev) = mean_stddev(&all_reg_latencies.iter().map(|f| *f as f64).collect::<Vec<_>>());
-		file_csv.write(format!("avg,{}\n", avg).as_bytes()).unwrap();
-		file_csv.write(format!("stddev,{}\n", stddev).as_bytes()).unwrap();
-		for p in 0..101 {
-			let p2 = p as f64 / 100.0f64;
-			let idx = (p2 * (all_reg_latencies.len() - 1) as f64) as usize;
-			let val = all_reg_latencies[idx];
-			file_csv.write(format!("{},{}\n", p2, val).as_bytes()).unwrap();
-		}
-	}
-	{
-		let mut file_csv = OpenOptions::new()
-			.truncate(true)
-			.create(true)
-			.write(true)
 			.open(format!("{upfname}-reg-throughput-{}.csv", round_time_ms))
 			.unwrap();
 		all_reg_throughputs.sort_by(|a, b| a.partial_cmp(b).unwrap());
@@ -885,25 +790,6 @@ async fn main() {
 			let p2 = p as f64 / 100.0f64;
 			let idx = (p2 * (all_reg_throughputs.len() - 1) as f64) as usize;
 			let val = all_reg_throughputs[idx];
-			file_csv.write(format!("{},{}\n", p2, val).as_bytes()).unwrap();
-		}
-	}
-	{
-		let mut file_csv = OpenOptions::new()
-			.truncate(true)
-			.create(true)
-			.write(true)
-			.open(format!("{upfname}-dereg-latency-{}.csv", round_time_ms))
-			.unwrap();
-		let mut all_dereg_latencies = all_dereg_latencies.write().await;
-		all_dereg_latencies.sort_by(|a, b| a.partial_cmp(b).unwrap());
-		let (avg, stddev) = mean_stddev(&all_dereg_latencies.iter().map(|f| *f as f64).collect::<Vec<_>>());
-		file_csv.write(format!("avg,{}\n", avg).as_bytes()).unwrap();
-		file_csv.write(format!("stddev,{}\n", stddev).as_bytes()).unwrap();
-		for p in 0..101 {
-			let p2 = p as f64 / 100.0f64;
-			let idx = (p2 * (all_dereg_latencies.len() - 1) as f64) as usize;
-			let val = all_dereg_latencies[idx];
 			file_csv.write(format!("{},{}\n", p2, val).as_bytes()).unwrap();
 		}
 	}
